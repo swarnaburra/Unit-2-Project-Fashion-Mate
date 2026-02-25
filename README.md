@@ -1,4 +1,4 @@
-# <img width="102" height="102" alt="fm-logo" src="https://github.com/user-attachments/assets/d5f8e90b-38be-4560-8af8-c49376a3afbe" /> FashionMate Backend
+# <img width="50" height="50" alt="fm-logo" src="https://github.com/user-attachments/assets/d5f8e90b-38be-4560-8af8-c49376a3afbe" /> FashionMate Backend
 
 ## 📌 Project Description
 
