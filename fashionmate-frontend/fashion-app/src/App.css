@@ -1,0 +1,70 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: white; /* i want soft lavender-pink */
+  text-align: center;
+  padding: 1.5rem 0;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+}
+
+/* Base pulse animation */
+.pulse-btn {
+  animation: pulse 1.2s infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Hover effect */
+.pulse-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 15px rgba(48, 2, 12, 0.299); 
+}
+
+main {
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
+}
+
+main h2 {
+  margin-bottom: 1rem;
+}
+
+main p {
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-size: 1rem;
+  color: #444;
+}
+
+footer {
+  background-color: white;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+footer a {
+  color: white;
+  text-decoration: underline;
+}

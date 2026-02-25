@@ -1,0 +1,137 @@
+/* Base pulse animation */
+.cta-button {
+  animation: pulse 1.2s infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Pulse keyframes */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Hover effect */
+.cta-button:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.591); /* pink glow */
+}
+/* Base pulse animation */
+.pulse-btn {
+  animation: pulse 1.2s infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Hover effect */
+.pulse-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); /* a soft pink glow */
+}
+
+
+/* Container with background image */
+.home-container {
+  height: 100vh;
+  background-image: url('/homepage.jpeg');
+  background-size: contain; 
+  background-position: top center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 20px;
+}
+
+/* Adding Dark overlay */
+.home-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.35);
+  z-index: 1;
+}
+
+/* Hero content */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+
+.app-name {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+}
+
+.tagline {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+.cta-button {
+  padding: 10px 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  background-color: #8e131bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+
+
+/* Adding breakpoint for a Tablet user */
+
+@media (max-width: 768px) {
+  .app-name {
+    font-size: 2.2rem;
+  }
+  .tagline {
+    font-size: 1rem;
+  }
+  .cta-button {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Adding breakpoint for a Mobile user */
+
+@media (max-width: 480px) {
+  .app-name {
+    font-size: 1.8rem;
+  }
+  .tagline {
+    font-size: 0.9rem;
+  }
+  .cta-button {
+    padding: 6px 16px;
+    font-size: 0.8rem;
+  }
+
+  .hero-content {
+    padding: 10px;
+  }
+
+  .home-container {
+    padding: 10px;
+  }
+}
