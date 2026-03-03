@@ -36,7 +36,7 @@ About page with details on FashionMateApp Team details, App features and Review 
 
 ## 📌 Project Description
 
-FashionMate is a fashion styling application designed to help users discover and manage their personal style. The backend is built using Spring Boot and provides RESTful APIs for user authentication, style preference management, outfit storage, quiz results, and trending fashion data. It connects to a MySQL database and serves as the core system powering the FashionMate application.![homepage](https://github.com/user-attachments/assets/5e64b1e2-5b7d-48a2-973a-385f72b461f7)
+FashionMate is a fashion styling application designed to help users discover and manage their personal style. The backend is built using Spring Boot and provides RESTful APIs for user authentication, style preference management, outfit storage, quiz results, and trending fashion data. It connects to a MySQL database and serves as the core system powering the FashionMate application.
 
 
 ---
