@@ -80,3 +80,77 @@
 .nav-links a:hover {
   color: #44052e;
 }
+
+/* Auth Section */
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-right: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.signup-button,
+.logout-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.signup-button {
+  background-color: #667eea;
+  color: white;
+}
+
+.signup-button:hover {
+  background-color: #764ba2;
+  transform: translateY(-2px);
+}
+
+.logout-button {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 15px 20px;
+  }
+
+  .auth-section {
+    margin-right: 10px;
+  }
+
+  .user-name {
+    font-size: 12px;
+  }
+
+  .signup-button,
+  .logout-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

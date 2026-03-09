@@ -1,9 +1,20 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 import "./Home.css";
 
 function Home() {
   const navigate= useNavigate();
+  const { userId } = useUser();
+
+  const handleGetStarted = () => {
+    if (userId) {
+      navigate("/glamup");
+    } else {
+      navigate("/signup");
+    }
+  };
+
   return (
     <div className="home-container">
       <div className="hero-content">
@@ -11,11 +22,11 @@ function Home() {
         <p className="tagline">Discover your perfect style.</p>
 
         <button className="cta-button"
-        onClick={() => navigate("/glamup")}
+        onClick={handleGetStarted}
         >
-          Get Started
+          {userId ? "Get Started" : "Sign Up to Get Started"}
           
-          </button>
+        </button>
       </div>
     </div>
   );

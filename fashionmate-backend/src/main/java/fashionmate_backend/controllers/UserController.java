@@ -3,13 +3,11 @@ package fashionmate_backend.controllers;
 import fashionmate_backend.models.User;
 import fashionmate_backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin
 public class UserController {
 
 
@@ -21,8 +19,9 @@ public class UserController {
     public User createUser(@RequestBody User user) {
         return userRepository.save(user);
     }
+
     @PostMapping("/signup")
-    public boolean signUp(@RequestBody User request) throws Exception {
+    public Long signUp(@RequestBody User request) throws Exception {
         // Check for the new user's name, email, and password
         if (request.getName() == null || request.getEmail() == null || request.getPassword() == null) {
             throw new Exception("Add the missing fields");
@@ -31,24 +30,25 @@ public class UserController {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new Exception("Email already in use");
         }
-        userRepository.save(request);
+        final User user = userRepository.save(request);
 
-        return true;
+        return user.getId();
     }
 
     @PostMapping("/signin")
-    public boolean signIn(@RequestBody User request) throws Exception {
+    public Long signIn(@RequestBody User request) throws Exception {
         //Check for the user's email and password is null or not
-        if (request.getEmail() == null || request.getPassword() == null){
+        if (request.getEmail() == null || request.getPassword() == null) {
             throw new Exception("Please enter your correct email and password");
         }
 
-        if (userRepository.existsByEmailAndPassword(request.getEmail(), request.getPassword())){
-            return true;
-       }
-        return true;
+        final User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword());
+        if (user != null) {
+            return user.getId();
+        } else {
+            throw new RuntimeException("User not found");
+        }
     }
-
 
 
 }

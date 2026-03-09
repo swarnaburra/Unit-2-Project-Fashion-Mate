@@ -8,7 +8,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
+    private String name;
     private String comment;
     private int rating;
 
@@ -18,19 +18,34 @@ public class Review {
     private User user;
 
 
-    @ManyToOne
-    @JoinColumn(name = "style_lens_id", nullable = false)
-    private StyleLens styleLens;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public User getUser() {
+
         return user;
     }
 
     public void setUser(User user) {
+
         this.user = user;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getComment(){
+
         return comment;
     }
 
@@ -40,6 +55,7 @@ public class Review {
     }
 
     public int getRating(){
+
         return rating;
     }
 
@@ -47,14 +63,7 @@ public class Review {
         this.rating = rating;
     }
 
-    public StyleLens getStyleLens(){
-        return styleLens;
-    }
 
-
-    public void setStyleLens(StyleLens styleLens){
-        this.styleLens = styleLens;
-    }
 
     public Review(){
 

@@ -1,13 +1,28 @@
 import React, { useState } from "react";
 import "./Header.css";
-import { FaCamera, FaQuestionCircle, FaInfoCircle } from "react-icons/fa";
+import { FaCamera, FaQuestionCircle, FaInfoCircle, FaSignOutAlt } from "react-icons/fa";
+import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { userId, logout } = useUser();
+  const navigate = useNavigate();
 
   function toggleMenu() {
     return setIsOpen(!isOpen);
   }
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    navigate('/');
+  };
+
+  const handleSignup = () => {
+    navigate('/signup');
+    setIsOpen(false);
+  };
 
   return (
     <header className="header">
@@ -15,6 +30,18 @@ function Header() {
       {/*Adding logo to the top left of the webpage */}
       <div className="logo">
         <img src="/fm-logo.png" alt="FashionMate logo" />
+      </div>
+
+      {/* User Info / Auth Button */}
+      <div className="auth-section">
+        {userId ? (
+          <div className="user-info">
+            <span className="user-name">Welcome, User</span>
+            <button className="logout-button" onClick={handleLogout}>
+              <FaSignOutAlt size={16} /> Logout
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {/* Adding Hamburger menu in the right corner of the webpage */}

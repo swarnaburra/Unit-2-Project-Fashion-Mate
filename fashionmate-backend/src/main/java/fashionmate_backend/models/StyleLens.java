@@ -17,8 +17,8 @@ public class StyleLens {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
     private String decision;
+    @Lob
     private String image;
 
     public StyleLens(){
