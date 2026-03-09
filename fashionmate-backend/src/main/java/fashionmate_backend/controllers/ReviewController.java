@@ -1,7 +1,9 @@
 package fashionmate_backend.controllers;
 
 import fashionmate_backend.models.Review;
+import fashionmate_backend.models.User;
 import fashionmate_backend.repositories.ReviewRepository;
+import fashionmate_backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,41 +11,42 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
+@CrossOrigin
 public class ReviewController {
 
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
-    @GetMapping("/{id}")
-    public Optional<Review> getReviewById(@PathVariable Long id) {
-        return reviewRepository.findById(id);
+    @GetMapping("/{userId}")
+    public List<Review> getReviewById(@PathVariable Long userId) {
+        checkUserExist(userId);
+        return reviewRepository.findAllByUserId(userId);
     }
 
 
-    @PostMapping
-    public Review createReview(@RequestBody Review review) {
+    @PostMapping("/{userId}")
+    public Review createReview(@PathVariable Long userId, @RequestBody Review review) {
+        final User user = checkUserExist(userId);
+        review.setUser(user);
         return reviewRepository.save(review);
     }
 
-    // Update an existing review
-   @PutMapping("/{id}")
-   public Review updateReview(@PathVariable Long id, @RequestBody Review reviewDetails){
-        Review review = reviewRepository.findById(id).orElse(null);
 
-        if(review == null){
-            throw new RuntimeException("Review not found");
+    @DeleteMapping("/{userId}/review/{reviewId}")
+    public void deleteReview(@PathVariable Long userId, @PathVariable Long reviewId) {
+        checkUserExist(userId);
+        reviewRepository.deleteById(reviewId);
+    }
+
+    private User checkUserExist(Long userId) {
+        final Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new RuntimeException("User does not exist");
         }
-
-        return reviewRepository.save(review);
-   }
-
-
-
-    // Delete a review
-    @DeleteMapping("/{id}")
-    public void deleteReview(@PathVariable Long id) {
-        reviewRepository.deleteById(id);
+        return user.get();
     }
 }
