@@ -38,7 +38,7 @@ export default function GlamUp() {
 
   return (
     <div className="glamup-container">
-      <h2 className="title">GlamUp</h2>
+      <h2 className="title" style={{ color: "rgb(31, 15, 27)" }}>GlamUp</h2>
       <p className="tagline">{glamupData.trendingStyle}</p>
 
       <div className="tiles">

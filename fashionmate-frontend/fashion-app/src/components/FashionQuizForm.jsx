@@ -17,7 +17,16 @@ export default function FashionQuizForm() {
     setSubmitted(true);
   };
   return (
-    <div>
+    <div style={{
+      minHeight: "100vh",
+      backgroundImage: "linear-gradient(rgba(182, 155, 178, 0.9), rgba(182, 155, 178, 0.9)), url('/homepage.jpeg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+      backgroundRepeat: "no-repeat",
+      padding: "2rem",
+      fontFamily: "sans-serif"
+    }}>
 
       <form onSubmit={handleSubmit}>
 
@@ -58,7 +67,7 @@ export default function FashionQuizForm() {
               fontSize: "16px",
               borderRadius: "8px",
               cursor: "pointer",
-              backgroundColor: "#8e131bff",
+              backgroundColor: "rgb(120, 90, 102)",
               color: "white",
               border: "none"
             }}

@@ -56,20 +56,20 @@ public class GlamUp {
         this.altText1 = altText1;
     }
 
-    public String getAltText2(){
-        return altText2;
-    }
-
-    public void setAltText2(String altText2){
-        this.altText2 = altText2;
-    }
-
     public String getImageUrl2(){
         return imageUrl2;
     }
 
     public void setImageUrl2(String imageUrl2){
         this.imageUrl2 = imageUrl2;
+    }
+
+    public String getAltText2(){
+        return altText2;
+    }
+
+    public void setAltText2(String altText2){
+        this.altText2 = altText2;
     }
 
     public String getImageUrl3(){

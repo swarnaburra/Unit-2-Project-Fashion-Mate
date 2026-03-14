@@ -8,7 +8,7 @@ export default function BackToHome () {
           display: "inline-block",
           marginTop: "1rem",
           padding: "0.5rem 1rem",
-          background: "#8e131bff",
+          background: "rgb(83, 39, 13)",
           color: "white",
           borderRadius: 5,
           textDecoration: "none",

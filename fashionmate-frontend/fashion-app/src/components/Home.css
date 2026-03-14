@@ -14,7 +14,7 @@
 /* Hover effect */
 .cta-button:hover {
   transform: scale(1.12);
-  box-shadow: 0 0 15px rgba(255, 105, 180, 0.591); /* pink glow */
+  box-shadow: 0 0 15px rgba(74, 12, 43, 0.591); 
 }
 /* Base pulse animation */
 .pulse-btn {
@@ -31,7 +31,7 @@
 /* Hover effect */
 .pulse-btn:hover {
   transform: scale(1.12);
-  box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); /* a soft pink glow */
+  box-shadow: 0 0 15px rgba(92, 28, 68, 0.5); 
 }
 
 
@@ -89,7 +89,7 @@
   font-size: 1rem;
   font-weight: bold;
   border: none;
-  background-color: #8e131bff;
+  background-color: rgb(83, 39, 13);
   color: white;
   cursor: pointer;
   border-radius: 5px;

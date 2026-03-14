@@ -1,6 +1,6 @@
 .glamup-container {
   min-height: 100vh;
-  background-image: url("/homepage.jpeg"); /* Adding my background image */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("/homepage.jpeg"); /* Adding my background image */
   background-size: cover; 
   background-position: center top; 
   background-repeat: no-repeat;
@@ -16,7 +16,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-color: rgba(0,0,0,0.35);
+  background-color: rgba(218, 193, 210, 0.35);
   z-index: 1;
 }
 

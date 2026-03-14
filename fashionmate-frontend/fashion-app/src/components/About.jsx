@@ -10,8 +10,8 @@ export default function About() {
 
   const team = [
     { id: 1, name: "Swarna Burra", role: "Founder & Designer" },
-    { id: 2, name: "Loralai Gilmore", role: "Frontend Developer" },
-    { id: 3, name: "Walter White", role: "Backend Developer" },
+    { id: 2, name: "Swarna Burra", role: "Frontend Developer" },
+    { id: 3, name: "Swarna Burra", role: "Backend Developer" },
   ];
 
   const features = [
@@ -88,14 +88,21 @@ export default function About() {
 
 
   return (
-    <div style={{ maxWidth: 800, margin: "2rem auto", fontFamily: "sans-serif" }}>
+    <div style={{ minHeight: "100vh",
+  backgroundImage: "linear-gradient(rgba(182, 155, 178, 0.9), rgba(182, 155, 178, 0.97)), url('/homepage.jpeg')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundAttachment: "fixed",
+  backgroundRepeat: "no-repeat",
+  padding: "2rem",
+  fontFamily: "sans-serif" }}>
       <h2>About FashionMate</h2>
 
       {/* TEAM TABLE */}
       <h3>Meet Our Team</h3>
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "2rem" }}>
         <thead>
-          <tr style={{ background: "#8e131bff", color: "white" }}>
+          <tr style={{ background: "rgb(120, 90, 102)", color: "white" }}>
             <th style={{ padding: "0.5rem", border: "1px solid #ddd" }}>#</th>
             <th style={{ padding: "0.5rem", border: "1px solid #ddd" }}>Name</th>
             <th style={{ padding: "0.5rem", border: "1px solid #ddd" }}>Role</th>
@@ -173,7 +180,7 @@ export default function About() {
       <h3 style={{ marginTop: "2rem" }}>Your Submitted Feedback</h3>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr style={{ background: "#333", color: "white" }}>
+          <tr style={{ background: "rgb(120, 90, 102)", color: "white" }}>
             <th style={{ padding: "0.5rem", border: "1px solid #ddd" }}>Name</th>
             <th style={{ padding: "0.5rem", border: "1px solid #ddd" }}>Rating</th>
             <th style={{ padding: "0.5rem", border: "1px solid #ddd" }}>Review</th>
@@ -191,7 +198,7 @@ export default function About() {
                 <td
                   style={{
                     padding: "0.5rem",
-                    border: "1px solid #ddd",
+                    border: "1px solid #a888a5",
                     textAlign: "center",
                     cursor: "pointer",
                     color: "red",
