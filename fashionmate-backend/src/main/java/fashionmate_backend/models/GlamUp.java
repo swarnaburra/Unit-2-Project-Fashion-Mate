@@ -1,9 +1,6 @@
 package fashionmate_backend.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class GlamUp {
@@ -13,12 +10,15 @@ public class GlamUp {
 
     private String trendingStyle;
 
+    @Lob
     private String imageUrl1;
     private String altText1;
 
+    @Lob
     private String imageUrl2;
     private String altText2;
 
+    @Lob
     private String imageUrl3;
     private String altText3;
 
