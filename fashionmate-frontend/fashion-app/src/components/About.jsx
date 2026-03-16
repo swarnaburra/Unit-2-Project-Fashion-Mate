@@ -168,7 +168,7 @@ export default function About() {
             style={{ width: "100%", padding: "5px", marginBottom: "10px" }}
           ></textarea><br />
 
-          <button type="submit" style={{ padding: "5px 10px" }}>Submit</button>
+          <button type="submit" style={{ padding: "5px 10px", background: "rgb(83, 39, 13)", color: "white", border: "none" }}>Submit</button>
         </form>
 
         {reviewMessage && (
