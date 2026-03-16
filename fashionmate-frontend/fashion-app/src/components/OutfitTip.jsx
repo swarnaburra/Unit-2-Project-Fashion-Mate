@@ -34,7 +34,7 @@ export default function OutfitTip() {
   return (
     <div className="outfittip-container">
       <p className="fashion-tip">
-        <strong>Fashion Tip:</strong>{" "}
+         <strong> 👗 Fashion Tip:</strong>{" "}
         <strong>
           <em>"{outfittipData}"</em>
         </strong>
