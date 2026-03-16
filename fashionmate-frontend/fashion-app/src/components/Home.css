@@ -135,3 +135,10 @@
     padding: 10px;
   }
 }
+
+.tip-section {
+  margin-top: 25px;
+  font-size: 16px;
+  color: white;
+  font-style: italic;
+}
