@@ -13,6 +13,8 @@ Features include:
 
 Tech Used
 React
+Java
+SpringBoot
 Google GenAI
 React Router
 CSS
