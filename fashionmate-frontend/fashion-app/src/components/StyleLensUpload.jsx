@@ -298,7 +298,7 @@ export default function StyleLensUpload() {
           style={{
             width: "100%",
             padding: "1rem",
-            background: loading ? "#d19cbada" : "rgb(120, 90, 102)",
+            background: loading ? "#d19cbada" : "rgb(83, 39, 13)",
             color: "white",
             border: "none",
             borderRadius: 4,
