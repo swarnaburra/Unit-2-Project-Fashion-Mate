@@ -2,9 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import "./Home.css";
+import OutfitTip from "./OutfitTip";
 
 function Home() {
-  const navigate= useNavigate();
+  const navigate= useNavigate();  
   const { userId } = useUser();
 
   const handleGetStarted = () => {
@@ -27,7 +28,12 @@ function Home() {
           {userId ? "Get Started" : "Sign Up to Get Started"}
           
         </button>
-      </div>
+        <div className="tip-section">
+        <OutfitTip />
+        </div>
+        </div>
+
+         
     </div>
   );
 }
