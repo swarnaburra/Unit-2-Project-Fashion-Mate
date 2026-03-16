@@ -3,13 +3,15 @@ package fashionmate_backend.controllers;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Random;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin()
+@RequestMapping("/api/outfit-tip")
 public class OutfitTipController {
 
     private final List<String> tips = List.of(
@@ -24,7 +26,7 @@ public class OutfitTipController {
 
     private final Random random = new Random();
 
-    @GetMapping("/outfit-tip")
+    @GetMapping()
     public String getRandomTip(){
         return tips.get(random.nextInt(tips.size()));
     }

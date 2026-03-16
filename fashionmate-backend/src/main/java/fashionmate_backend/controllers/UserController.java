@@ -35,7 +35,7 @@ public class UserController {
         return user.getId();
     }
 
-    @PostMapping("/signin")
+    @PutMapping("/signin")
     public Long signIn(@RequestBody User request) throws Exception {
         //Check for the user's email and password is null or not
         if (request.getEmail() == null || request.getPassword() == null) {

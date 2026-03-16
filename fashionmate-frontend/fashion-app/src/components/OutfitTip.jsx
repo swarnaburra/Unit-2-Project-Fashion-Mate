@@ -11,7 +11,7 @@ export default function OutfitTip() {
 
   const fetchTip = async () => {
     try {
-      const response = await fetch("http://localhost:8080/outfit-tip");
+      const response = await fetch("http://localhost:8080/api/outfit-tip");
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

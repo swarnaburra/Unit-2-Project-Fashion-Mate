@@ -40,10 +40,9 @@ export default function FashionQuiz({style, color}) {
           </div>
         </div>
 
-        <div style={{ marginTop: "20px" }}>
-          <BackToHome />
-        </div>
+       
       </div>
+      <BackToHome />
     </div>
   );
 }

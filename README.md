@@ -18,6 +18,7 @@ React Router
 CSS
 
 HomePage of FashionMate app showing Get Started button to navigate to GlamUp, FMLogo, Hamburger menu (with StyleLens, FashionQuiz, About)
+
 <img width="3057" height="1399" alt="Untitled" src="https://github.com/user-attachments/assets/10a27239-25e6-4e82-93ba-ba7925d7bcf9" />
 
 Get Started navigating into GlamUp for seasonal fashion tips 
