@@ -7,6 +7,9 @@ Features include:
 -Upload an outfit image
 -powered fashion feedback
 -View style and color suggestions
+-Fashion Tips on the HomePage
+-User SignUp and Login
+-Review form for the user
 -Fashion quiz using props
 -Simple and clean UI
 -Deployed on Netlify
@@ -18,6 +21,7 @@ SpringBoot
 Google GenAI
 React Router
 CSS
+HTML
 
 HomePage of FashionMate app showing Get Started button to navigate to GlamUp, FMLogo, Hamburger menu (with StyleLens, FashionQuiz, About)
 
@@ -113,11 +117,13 @@ https://lucid.app/lucidchart/2d663294-6ded-4e80-a7de-dc7e11b01d04
 
 🚧 Future Improvements
 
-Implement JWT authentication
+Add Two Factor Authentication for the Security of the User profile safety
 
 Add role-based access (Admin/User)
 
-Improve validation and exception handling
+Add Recommend Me Button in StyleLens for user with New Outfit Ideas
+
+Add marketplace and pricing for the recommended outfits in case User wants to buy similar outfits.
 
 
 👩‍💻 Author
