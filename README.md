@@ -69,7 +69,8 @@ FashionMate is a fashion styling application designed to help users discover and
 - Generate outfit ideas using **StyleLens**  
 - Display trending styles using **GlamUp**  
 - Style quiz submission (Fashion Quiz)  
-- Display reviews and ratings on homepage  
+- Reviews done by the user and delete the last submitted review
+- Display Fashion-Tip on the homepage  
 - REST API endpoints for frontend integration  
 
 ---
