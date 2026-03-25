@@ -18,7 +18,7 @@ Tech Used
 React
 Java
 SpringBoot
-Google GenAI
+Gemini AI
 React Router
 CSS
 HTML
@@ -47,7 +47,7 @@ HTML
 
 **FashionQuiz for getting outfit by user answering quiz based on favorite color and preferred style of outfit**
 
-<img width="3149" height="1451" alt="fashionquiz" src="https://github.com/user-attachments/assets/401d9e24-48c8-4d69-8d48-e5384f1dc42a" />
+<img width="2506" height="1452" alt="FashionQuiz" src="https://github.com/user-attachments/assets/ef13defe-9a41-4c8a-a0e9-a35d8f1f4a8c" />
 
 **About page with details on FashionMateApp Team details, App features and Review from the user**
 
@@ -58,9 +58,9 @@ HTML
 <img width="1326" height="974" alt="review" src="https://github.com/user-attachments/assets/6f4871ef-165b-4ec6-a7d2-5dd6ef67a88f" />
 
 
-# <img width="50" height="50" alt="fm-logo" src="https://github.com/user-attachments/assets/d5f8e90b-38be-4560-8af8-c49376a3afbe" /> FashionMate Backend
+# <img width="50" height="50" alt="fm-logo" src="https://github.com/user-attachments/assets/d5f8e90b-38be-4560-8af8-c49376a3afbe" /> **FashionMate Backend**
 
-## 📌 Project Description
+## 📌 **Project Description**
 
 FashionMate is a fashion styling application designed to help users discover and manage their personal style. The backend is built using Spring Boot and provides RESTful APIs for user authentication, style preference management, outfit storage, quiz results, and trending fashion data. It connects to a MySQL database and serves as the core system powering the FashionMate application.
 
@@ -120,6 +120,7 @@ spring.datasource.url=jdbc:mysql://localhost:3306/fashionmate_db
 spring.datasource.username=your_mysql_username
 spring.datasource.password=your_mysql_password
 spring.jpa.hibernate.ddl-auto=update
+gemini.api.key=ASKSIWNDIDN
 5️⃣ Reload Maven Dependencies
 6️⃣ Run the Spring Boot Application
 7️⃣ Test Using Postman
@@ -139,11 +140,11 @@ https://lucid.app/lucidchart/2d663294-6ded-4e80-a7de-dc7e11b01d04
 
 Add Two Factor Authentication for the Security of the User profile safety
 
-Add role-based access (Admin/User)
+Add Role-based access (Admin/User)
 
 Add Recommend Me Button in StyleLens for user with New Outfit Ideas
 
-Add marketplace and pricing for the recommended outfits in case User wants to buy similar outfits.
+Add Marketplace and Pricing for the recommended outfits in case User wants to buy similar outfits.
 
 
 👩‍💻 Author
