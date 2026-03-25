@@ -40,15 +40,22 @@ HTML
 
 <img width="2509" height="1450" alt="Glamup" src="https://github.com/user-attachments/assets/e99bf766-6559-4c56-ac3f-1ab165cb5ec3" />
 
-StyleLens for personalized fashion tips and trends using Gemini AI for analyzing the uploaded photograph and giving suggestions
-<img width="3135" height="1395" alt="STYLELENS" src="https://github.com/user-attachments/assets/7d81cdd1-5bf8-4009-aaaf-da72976b4f7d" />
+**StyleLens for personalized fashion tips and trends using Gemini AI for analyzing the uploaded photograph and giving suggestions**
 
-FashionQuiz for getting outfit by user answering quiz based on favorite color and preferred style of outfit
+<img width="1326" height="1409" alt="StyleLens" src="https://github.com/user-attachments/assets/e7a4add0-dd0d-4dcb-80b0-138e6b13d155" />
+
+
+**FashionQuiz for getting outfit by user answering quiz based on favorite color and preferred style of outfit**
+
 <img width="3149" height="1451" alt="fashionquiz" src="https://github.com/user-attachments/assets/401d9e24-48c8-4d69-8d48-e5384f1dc42a" />
 
-About page with details on FashionMateApp Team details, App features and Review from the user
+**About page with details on FashionMateApp Team details, App features and Review from the user**
+
 <img width="1326" height="1116" alt="Aboutpage" src="https://github.com/user-attachments/assets/413c8ae4-1a4a-429f-82d3-c755ee0de786" />
 
+**Review Form**
+
+<img width="1326" height="974" alt="review" src="https://github.com/user-attachments/assets/6f4871ef-165b-4ec6-a7d2-5dd6ef67a88f" />
 
 
 # <img width="50" height="50" alt="fm-logo" src="https://github.com/user-attachments/assets/d5f8e90b-38be-4560-8af8-c49376a3afbe" /> FashionMate Backend
