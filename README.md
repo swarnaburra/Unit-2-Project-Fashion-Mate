@@ -23,12 +23,12 @@ React Router
 CSS
 HTML
 
-HomePage of FashionMate app showing Get Started button to navigate to SignUp to Get Started Button to access - GlamUp, FMLogo, Hamburger menu (with StyleLens, FashionQuiz, About).FASHIONTIP is an additional feature displayed on the HomePage to make app appealing for the Users.
+**HomePage of FashionMate App** showing Get Started button to navigate to SignUp to Get Started Button to access - GlamUp, FMLogo, Hamburger menu (with StyleLens, FashionQuiz, About).FASHIONTIP is an additional feature displayed on the HomePage to make app appealing for the Users.
 
 <img width="2444" height="1398" alt="fashionmate" src="https://github.com/user-attachments/assets/3dd71359-8add-43f1-9e46-56f56c37c9bd" />
 
 
-SignUp-Login Page
+**SignUp-Login Page**
 
 <img width="2504" height="1442" alt="SignUp-Login page" src="https://github.com/user-attachments/assets/4667c7fd-0b4c-41f8-9de3-808c531cb42a" />
 
@@ -36,10 +36,9 @@ SignUp-Login Page
 <img width="2503" height="1455" alt="LoginPage" src="https://github.com/user-attachments/assets/bc6f2043-281e-4b86-abc5-5fd525d2e532" />
 
 
-Get Started navigating into GlamUp for seasonal fashion tips 
+**Get Started navigating into GlamUp for seasonal fashion tips **
 
-<img width="3126" height="1437" alt="GlamUp" src="https://github.com/user-attachments/assets/06c61457-aa8c-42b2-b6cb-274214b36981" />
-
+<img width="2509" height="1450" alt="Glamup" src="https://github.com/user-attachments/assets/e99bf766-6559-4c56-ac3f-1ab165cb5ec3" />
 
 StyleLens for personalized fashion tips and trends using Gemini AI for analyzing the uploaded photograph and giving suggestions
 <img width="3135" height="1395" alt="STYLELENS" src="https://github.com/user-attachments/assets/7d81cdd1-5bf8-4009-aaaf-da72976b4f7d" />
