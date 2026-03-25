@@ -23,9 +23,13 @@ React Router
 CSS
 HTML
 
-HomePage of FashionMate app showing Get Started button to navigate to GlamUp, FMLogo, Hamburger menu (with StyleLens, FashionQuiz, About)
+HomePage of FashionMate app showing Get Started button to navigate to SignUp to Get Started Button to access - GlamUp, FMLogo, Hamburger menu (with StyleLens, FashionQuiz, About).FASHIONTIP is an additional feature displayed on the HomePage to make app appealing for the Users.
 
-<img width="3057" height="1399" alt="Untitled" src="https://github.com/user-attachments/assets/10a27239-25e6-4e82-93ba-ba7925d7bcf9" />
+<img width="2444" height="1398" alt="fashionmate" src="https://github.com/user-attachments/assets/3dd71359-8add-43f1-9e46-56f56c37c9bd" />
+
+
+SignUp-Login Page
+
 
 Get Started navigating into GlamUp for seasonal fashion tips 
 <img width="3126" height="1437" alt="GlamUp" src="https://github.com/user-attachments/assets/06c61457-aa8c-42b2-b6cb-274214b36981" />
