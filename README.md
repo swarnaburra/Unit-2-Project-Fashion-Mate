@@ -38,7 +38,10 @@ FashionQuiz for getting outfit by user answering quiz based on favorite color an
 <img width="3149" height="1451" alt="fashionquiz" src="https://github.com/user-attachments/assets/401d9e24-48c8-4d69-8d48-e5384f1dc42a" />
 
 About page with details on FashionMateApp Team details, App features and Review from the user
-<img width="3144" height="1388" alt="About" src="https://github.com/user-attachments/assets/30053914-eb1d-4c6f-9d5f-65797807268b" />
+<img width="1326" height="1116" alt="Aboutpage" src="https://github.com/user-attachments/assets/413c8ae4-1a4a-429f-82d3-c755ee0de786" />
+
+
+
 # <img width="50" height="50" alt="fm-logo" src="https://github.com/user-attachments/assets/d5f8e90b-38be-4560-8af8-c49376a3afbe" /> FashionMate Backend
 
 ## 📌 Project Description
