@@ -30,8 +30,14 @@ HomePage of FashionMate app showing Get Started button to navigate to SignUp to 
 
 SignUp-Login Page
 
+<img width="2504" height="1442" alt="SignUp-Login page" src="https://github.com/user-attachments/assets/4667c7fd-0b4c-41f8-9de3-808c531cb42a" />
+
+
+<img width="2503" height="1455" alt="LoginPage" src="https://github.com/user-attachments/assets/bc6f2043-281e-4b86-abc5-5fd525d2e532" />
+
 
 Get Started navigating into GlamUp for seasonal fashion tips 
+
 <img width="3126" height="1437" alt="GlamUp" src="https://github.com/user-attachments/assets/06c61457-aa8c-42b2-b6cb-274214b36981" />
 
 
