@@ -50,8 +50,7 @@ HTML
 <img width="2506" height="1452" alt="FashionQuiz" src="https://github.com/user-attachments/assets/ef13defe-9a41-4c8a-a0e9-a35d8f1f4a8c" />
 
 **About page with details on FashionMateApp Team details, App features and Review from the user**
-
-<img width="1326" height="1116" alt="Aboutpage" src="https://github.com/user-attachments/assets/413c8ae4-1a4a-429f-82d3-c755ee0de786" />
+<img width="3148" height="1454" alt="About-Page" src="https://github.com/user-attachments/assets/f08e4cfb-38d2-44ff-bd9b-980155ec1e68" />
 
 **Review Form**
 
@@ -108,7 +107,7 @@ FashionMate is a fashion styling application designed to help users discover and
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/swarnaburra/fashionmate-backend.git
+git clone https://github.com/swarnaburra/Unit-2-Project-Fashion-Mate.git
 2️⃣ Open in IntelliJ IDEA
 
 Import as a Maven project.
