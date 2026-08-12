@@ -22,11 +22,13 @@ export default function About() {
 
   // 🔹 Fetch all feedback for this user
   useEffect(() => {
+    if (!userId) return;
+
     fetch(`http://localhost:8080/api/reviews/${userId}`)
       .then((res) => res.json())
       .then((data) => setFeedbackList(data))
       .catch((err) => console.error("Error loading feedback:", err));
-  }, []);
+  }, [userId]);
 
   // 🔹 Submit feedback to backend
   const handleReviewSubmit = async (e) => {

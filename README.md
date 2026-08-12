@@ -91,15 +91,27 @@ Import as a Maven project.
 
 3️⃣ Create MySQL Database
 CREATE DATABASE fashionmate_db;
-4️⃣ Configure application.properties
-spring.datasource.url=jdbc:mysql://localhost:3306/fashionmate_db
-spring.datasource.username=your_mysql_username
-spring.datasource.password=your_mysql_password
-spring.jpa.hibernate.ddl-auto=update
+
+4️⃣ Set required environment variables
+
+`application.properties` reads secrets from environment variables — it never contains
+real credentials. Before running the app, set:
+- `DB_USERNAME` (defaults to `root` if unset)
+- `DB_PASSWORD` — your local MySQL password
+- `GEMINI_API_KEY` — a Gemini API key from Google AI Studio (https://aistudio.google.com/)
+
+In IntelliJ: Run/Debug Configurations → Environment variables. From a shell:
+```bash
+export DB_PASSWORD=your_mysql_password
+export GEMINI_API_KEY=your_gemini_api_key
+```
+
 5️⃣ Reload Maven Dependencies
 6️⃣ Run the Spring Boot Application
 7️⃣ Test Using Postman
 http://localhost:8080
+
+See `TESTING.md` for how to run the project's automated checks, and `FEATURES.md` for the backlog of planned improvements.
 
 🎨 Wireframes
 

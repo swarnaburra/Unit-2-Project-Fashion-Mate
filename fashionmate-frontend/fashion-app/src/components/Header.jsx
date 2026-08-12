@@ -41,7 +41,11 @@ function Header() {
               <FaSignOutAlt size={16} /> Logout
             </button>
           </div>
-        ) : null}
+        ) : (
+          <button className="logout-button" onClick={handleSignup}>
+            Sign Up
+          </button>
+        )}
       </div>
 
       {/* Adding Hamburger menu in the right corner of the webpage */}

@@ -90,6 +90,7 @@ export function UserProvider({ children }) {
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- hook is tightly coupled to UserProvider above
 export function useUser() {
   const context = useContext(UserContext);
   if (!context) {
