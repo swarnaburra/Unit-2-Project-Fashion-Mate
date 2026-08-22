@@ -18,6 +18,17 @@ Definition of done: every public method in every controller class has a Javadoc 
 `mvn compile` succeeds; `git diff` shows only comment additions, no logic/signature
 changes.
 
+### Results
+
+Merge decision: Merged
+Reason: Diff was comment-only (verified line by line -- every hunk was a pure addition,
+no removed/changed code), `mvn compile` reported `BUILD SUCCESS`, and the agent stayed
+entirely within `controllers/` as scoped. No interventions were needed during the run.
+Commits on this branch:
+```
+a9aec1e Add Javadoc to backend controller classes
+```
+
 ## Session B
 
 Branch name: `session-b-form-error-messages`
@@ -37,3 +48,21 @@ Commands the agent may run: `npm run lint` (check-only, no `--fix`) from
 Definition of done: error/validation messages in both forms are specific and
 user-friendly; `npm run lint` passes with 0 errors/warnings; no functional behavior
 changes beyond message text; `git diff` touches only the four files listed above.
+
+### Results
+
+Merge decision: Merged
+Reason: Messages were specific, accurate, and correctly reasoned from the actual backend
+behavior (the agent read `UserController.java` before writing the duplicate-email
+message, rather than guessing). No CSS changes were needed. `git diff` touched only
+`Login.jsx` and `Signup.jsx`, matching the write scope exactly.
+Intervention note: the agent correctly stopped and reported rather than running
+`npm install` on its own when it found `node_modules` missing in the fresh worktree
+(gitignored, so a new worktree never has it) -- `npm run lint` couldn't run without it.
+As orchestrator I ran `npm install` myself (a normal, low-risk setup step, not part of
+the agent's authorized commands) to unblock verification; lint then passed with 0
+errors/warnings.
+Commits on this branch:
+```
+53aa150 Make Login/Signup error messages specific and user-friendly
+```
