@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Base64;
 import java.util.Optional;
 
+/**
+ * Analyzes outfit photos using the Gemini API and records the resulting
+ * verdict as a {@link StyleLens} entry.
+ */
 @RestController
 @RequestMapping("/api/stylelens")
 @CrossOrigin
@@ -27,6 +31,22 @@ public class StyleLensController {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Handles {@code POST /api/stylelens/processImage/{userId}}.
+     * <p>
+     * Looks up the given user, builds a fashion-review prompt from the
+     * request's occasion/age/preference fields, sends the prompt and image
+     * to Gemini via {@link #generateContent(String, ImageRequest)}, and
+     * persists a {@link StyleLens} record capturing the image and whether
+     * the outfit was judged "YAY" or "NAY".
+     *
+     * @param userId the id of the user submitting the image, as a string
+     * @param imageRequest the request body containing the base64 image
+     *        contents, its mimetype, and the occasion/age/preference context
+     * @return the raw text response returned by the Gemini model
+     * @throws Exception if no user exists with the given {@code userId}, or if
+     *         the underlying Gemini request fails
+     */
     @PostMapping("/processImage/{userId}")
     public String processImage(@PathVariable String userId,
                                @RequestBody ImageRequest imageRequest) throws Exception {
@@ -58,6 +78,19 @@ public class StyleLensController {
         return geminiResponse;
     }
 
+    /**
+     * Sends a text prompt together with an image to the Gemini model and
+     * returns its text response.
+     * <p>
+     * Not a REST endpoint; this is a helper used by
+     * {@link #processImage(String, ImageRequest)} to decode the base64 image
+     * contents, combine them with the prompt, and invoke the Gemini client.
+     *
+     * @param prompt the text prompt describing what analysis to perform
+     * @param imageRequest the request containing the base64-encoded image
+     *        contents and its mimetype
+     * @return the text of the Gemini model's response
+     */
     public String generateContent(String prompt, ImageRequest imageRequest) {
         Client client = Client.builder().apiKey(apiKey).build();
 
