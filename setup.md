@@ -66,6 +66,106 @@ Verified afterward:
   (`/tmp/...` scratch files, `/root/.claude/*` and `/root/.npm/_logs` session/tool
   bookkeeping) -- nothing outside `/workspace` or `/claude-auth` was touched.
 
+## Parallel Agent Sessions (Git Worktrees)
+
+Running two agent sessions against this repo at once requires filesystem isolation, or
+one session's writes can silently overwrite the other's with no error and no conflict
+marker. Git worktrees give each session its own checked-out directory and branch while
+still sharing one `.git` history, so the human orchestrator only has to scope the tasks
+so they touch different files -- the worktrees handle keeping the sessions from
+colliding on disk.
+
+**1. Scope the tasks.** Pick two tasks that touch disjoint files. Example used here:
+Agent A refactors/adds tests under `fashionmate-backend/src/test/`; Agent B corrects
+documentation in `README.md`, `FEATURES.md`, and the frontend `README.md`. Neither
+touches a file the other does, so the eventual merge is conflict-free by construction.
+
+**2. Create one worktree + branch per session**, from the repo root, starting on `main`:
+
+```bash
+git worktree add ../fashionmate-agent-a -b feature/agent-a
+git worktree add ../fashionmate-agent-b -b feature/agent-b
+git worktree list   # confirms main + both worktrees, each on its own branch
+```
+
+**3. Launch one container per worktree**, mounting only that worktree (not the main repo)
+at `/workspace`:
+
+```powershell
+docker run -d --name agent-a `
+  -v claude-auth:/claude-auth `
+  -v "C:\Users\sarat\IdeaProjects\fashionmate-agent-a:/workspace" `
+  agent-sandbox:fashionmate `
+  tail -f /dev/null
+
+docker run -d --name agent-b `
+  -v claude-auth:/claude-auth `
+  -v "C:\Users\sarat\IdeaProjects\fashionmate-agent-b:/workspace" `
+  agent-sandbox:fashionmate `
+  tail -f /dev/null
+```
+
+Each session's task is then given to its own container via `docker exec ... claude -p
+--allowedTools="..." "<scoped task>"`, with `--allowedTools` restricted to what that
+specific task needs (e.g. Agent A got `Bash` to run `mvn test`; Agent B, doing pure doc
+edits, did not).
+
+**4. Monitor both sessions** while they run, and **5. review the diffs** in each worktree
+against `main` before merging:
+
+```bash
+cd ../fashionmate-agent-a && git status --short && git diff
+cd ../fashionmate-agent-b && git status --short && git diff
+```
+
+**6. Merge to main** (from the main worktree, one at a time):
+
+```bash
+git checkout main
+git merge --no-ff feature/agent-a -m "Merge feature/agent-a: ..."
+git merge --no-ff feature/agent-b -m "Merge feature/agent-b: ..."
+```
+
+Both merges were conflict-free here, which is the expected outcome of step 1's
+non-overlapping task scoping -- worktrees only prevent *filesystem* collisions during
+the session, they don't decide how the work is divided.
+
+**7. Clean up**, once merged and pushed:
+
+```powershell
+docker rm -f agent-a agent-b
+```
+```bash
+git worktree remove ../fashionmate-agent-a
+git worktree remove ../fashionmate-agent-b
+git branch -d feature/agent-a feature/agent-b   # -d refuses if not fully merged
+git worktree list                                # confirms only main remains
+```
+
+### Two collisions found while doing this (worth keeping in mind)
+
+**A Git worktree's `.git` file is not self-contained.** It's a one-line pointer back to
+the main repo's `.git/worktrees/<name>` folder (that's how worktrees share one object
+database/history). On Windows that pointer is an absolute `C:/Users/...` path, which a
+Linux container can't resolve if only the worktree folder is mounted -- `git` commands
+fail inside the container. Working around it by also bind-mounting the main repo's
+`.git` folder into the container is possible but leaks the whole shared git database into
+each session and creates other artifacts (a stray host-side directory, CRLF-driven false
+diffs). The simpler, cleaner choice made here: containers are used only for the agent's
+file edits/build/test work; anything requiring `git` (status, diff, commit, merge) is run
+from the host, where the worktree link resolves correctly and the same files are
+already there via the bind mount.
+
+**The shared `claude-auth` volume is itself an unisolated resource.** Both containers
+mounted the same named volume for the Claude Code OAuth credential. Launching both
+sessions' first `claude -p` call at the same moment caused a real collision: one
+session's token refresh raced the other's, and the losing session's container was left
+with a broken local auth cache that kept failing on every retry -- even after the
+credential file on the shared volume itself was fine again. The fix was recreating that
+one container fresh (same shared volume, clean container filesystem), which immediately
+authenticated. Documented under "what would be tightened next" below: staggering
+startup or giving each parallel session its own credential volume would avoid this.
+
 ## Security Decisions (provisional -- first pass)
 
 These are first-cut answers for this initial setup. They're expected to change as the
@@ -105,3 +205,5 @@ first place.
   access at all (e.g. pure static analysis), to shrink the attack surface further per task.
 - Re-evaluate whether `opencode-ai`, still present from the base image but unused here,
   should be stripped out once the base image itself is revisited.
+- Give parallel agent sessions their own `claude-auth` volume/credential (or stagger
+  their startup) instead of sharing one -- see the parallel-sessions collision above.
