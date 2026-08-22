@@ -24,15 +24,15 @@ function Login() {
 
   const validateForm = () => {
     if (!formData.email.trim()) {
-      setError('Email is required');
+      setError('Please enter your email address.');
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Please enter a valid email');
+      setError('Please enter a valid email address (e.g. name@example.com).');
       return false;
     }
     if (!formData.password) {
-      setError('Password is required');
+      setError('Please enter your password.');
       return false;
     }
     return true;
@@ -51,7 +51,14 @@ function Login() {
       // Redirect to home after successful login
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      // UserContext throws a generic "Login failed" for any non-OK response,
+      // which for this endpoint only happens on a wrong email/password combo.
+      // Anything else (e.g. a network failure) surfaces a different message.
+      if (err.message === 'Login failed') {
+        setError('Incorrect email or password. Please try again.');
+      } else {
+        setError('Unable to reach the server. Please check your connection and try again.');
+      }
     } finally {
       setLoading(false);
     }
