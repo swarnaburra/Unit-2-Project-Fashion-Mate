@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Serves short, canned outfit styling tips to the frontend.
+ */
 @RestController
 @CrossOrigin()
 @RequestMapping("/api/outfit-tip")
@@ -26,6 +29,14 @@ public class OutfitTipController {
 
     private final Random random = new Random();
 
+    /**
+     * Handles {@code GET /api/outfit-tip}.
+     * <p>
+     * Picks a random tip from the static {@link #tips} list.
+     *
+     * @return a randomly selected outfit tip string; never fails since {@link #tips}
+     *         is a fixed, non-empty, compile-time list
+     */
     @GetMapping()
     public String getRandomTip(){
         return tips.get(random.nextInt(tips.size()));
