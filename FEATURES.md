@@ -68,7 +68,7 @@ actually close the security gap, or just move it?).
 
 **Area:** Frontend (React/Vite)
 
-**Problem:** `http://localhost:8080` is hardcoded in six files (`UserContext.jsx`,
+**Problem:** `http://localhost:8080` is hardcoded in five files (`UserContext.jsx`,
 `About.jsx`, `GlamUp.jsx`, `OutfitTip.jsx`, `StyleLensUpload.jsx`), so the app cannot
 work once deployed (the README says it's deployed to Netlify).
 

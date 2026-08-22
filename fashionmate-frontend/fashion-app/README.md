@@ -1,3 +1,37 @@
+# FashionMate — Frontend (fashion-app)
+
+React + Vite single-page app for FashionMate. Talks to the Spring Boot backend in
+`fashionmate-backend` (see the root `README.md` for backend setup).
+
+## Running locally
+
+```bash
+npm install
+npm run dev      # start the Vite dev server
+npm run lint      # run ESLint (see ../../TESTING.md)
+npm run build     # production build
+```
+
+The app expects the backend at `http://localhost:8080` — this URL is currently
+hardcoded in several components (`UserContext.jsx`, `About.jsx`, `GlamUp.jsx`,
+`OutfitTip.jsx`, `StyleLensUpload.jsx`) rather than read from an env var; see the root
+`FEATURES.md` item 3 for the planned fix.
+
+## Routes
+
+- `/` — Home (fashion tip + get-started CTA)
+- `/signup`, `/login` — auth screens (email/password, no JWT yet)
+- `/stylelens` — upload an outfit photo for Gemini-powered YAY/NAY feedback (protected)
+- `/fashionquiz` — client-side style/color quiz, no backend call (protected)
+- `/glamup` — trending style + images (protected)
+- `/about` — team info, feature list, and the review form (protected)
+
+"Protected" routes redirect to `/signup` if no user is logged in (see
+`src/components/ProtectedRoute.jsx`). Auth state is just a numeric user ID kept in
+`localStorage` via `src/context/UserContext.jsx` — there is no token/session yet.
+
+---
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

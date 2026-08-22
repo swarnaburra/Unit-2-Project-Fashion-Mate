@@ -4,15 +4,15 @@
 FashionMate is a simple fashion recommendation app built using React and Google GenAI.
 Users can upload an image, get a Yay/Nay rating, and receive outfit suggestions. The app also includes a small fashion quiz and a review form.
 Features include:
--Upload an outfit image
--powered fashion feedback
--View style and color suggestions
--Fashion Tips on the HomePage
--User SignUp and Login
--Review form for the user
--Fashion quiz using props
--Simple and clean UI
--Deployed on Netlify
+- Upload an outfit image
+- AI-powered fashion feedback (YAY/NAY + improvement tips via Gemini)
+- View style and color suggestions
+- Fashion Tips on the HomePage
+- User SignUp and Login
+- Review form for the user
+- Fashion quiz using props
+- Simple and clean UI
+- Deployed on Netlify
 
 Tech Used
 React
@@ -82,23 +82,29 @@ FashionMate is a fashion styling application designed to help users discover and
 
 ## 🚀 Features
 
-- User registration & login  
-- Save user fashion style (masculine / feminine / etc.)  
-- Generate outfit ideas using **StyleLens**  
-- Display trending styles using **GlamUp**  
-- Style quiz submission (Fashion Quiz)  
-- Reviews done by the user and delete the last submitted review
-- Display Fashion-Tip on the homepage  
-- REST API endpoints for frontend integration  
+- User registration & login (numeric user ID returned and stored client-side)
+- **StyleLens**: upload an outfit photo with occasion/age/style preference, get YAY/NAY
+  feedback and improvement tips from Gemini
+- Display trending styles using **GlamUp**
+- Client-side Fashion Quiz that matches a chosen style + color to curated outfit images
+  (no backend call)
+- Submit a review and delete any submitted review
+- Display Fashion-Tip on the homepage
+- REST API endpoints for frontend integration
 
 ---
 
 ## 🔌 API Endpoints
 
-- `POST /users/register`
-- `POST /users/login`
-- `GET /outfits`
-- `POST /quiz`
+- `POST /api/users` — create a user record directly (no validation)
+- `POST /api/users/signup` — register a new user, returns the new numeric user ID
+- `PUT /api/users/signin` — log in with email/password, returns the numeric user ID
+- `GET /api/reviews/{userId}` — list a user's reviews
+- `POST /api/reviews/{userId}` — submit a review for a user
+- `DELETE /api/reviews/{userId}/review/{reviewId}` — delete a review by ID
+- `POST /api/stylelens/processImage/{userId}` — analyze an outfit image with Gemini
+- `GET /api/glamup` — get the trending style + images
+- `GET /api/outfit-tip` — get a random fashion tip
 
 ---
 
