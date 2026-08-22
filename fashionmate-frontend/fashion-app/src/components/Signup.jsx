@@ -25,19 +25,19 @@ function Signup() {
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      setError('Name is required');
+      setError('Please enter your full name.');
       return false;
     }
     if (!formData.email.trim()) {
-      setError('Email is required');
+      setError('Please enter your email address.');
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Please enter a valid email');
+      setError('Please enter a valid email address (e.g. name@example.com).');
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters long.');
       return false;
     }
     return true;
@@ -56,7 +56,14 @@ function Signup() {
       // Redirect to home after successful signup
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Signup failed. Please try again.');
+      // UserContext throws a generic "Signup failed" for any non-OK response.
+      // Since all other fields are validated above, that response is almost
+      // always the backend rejecting a duplicate email address.
+      if (err.message === 'Signup failed') {
+        setError('This email is already registered. Try logging in instead, or use a different email address.');
+      } else {
+        setError('Unable to reach the server. Please check your connection and try again.');
+      }
     } finally {
       setLoading(false);
     }
