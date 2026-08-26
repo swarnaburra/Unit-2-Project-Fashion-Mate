@@ -24,3 +24,8 @@ RUN curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/b
     && ln -s "/opt/apache-maven-${MAVEN_VERSION}/bin/mvn" /usr/local/bin/mvn \
     && rm /tmp/maven.tar.gz
 ENV CLAUDE_CONFIG_DIR=/claude-auth
+
+# Claude Code's background self-updater has repeatedly replaced the working Linux
+# binary with a Windows claude.exe in this container (breaking `claude` entirely
+# until reinstalled via `npm install -g @anthropic-ai/claude-code`). Disable it.
+ENV DISABLE_AUTOUPDATER=1
