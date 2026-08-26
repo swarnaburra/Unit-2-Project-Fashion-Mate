@@ -1,7 +1,11 @@
-# Iteration Log: Frontend Build Verification Agent
+# Iteration Log
 
-Records each run of the workflow defined in `docs/prd.md`, scored against
-`docs/rubric.md`.
+Records each run of every single-agent workflow in this repo, scored against its
+corresponding rubric.
+
+## Frontend Build Verification Agent
+
+Workflow defined in `docs/prd.md`, scored against `docs/rubric.md`.
 
 | Run ID | Date | Agent/Tool | Prompt/Command Used | Cycle Time | Rubric Scores (1-4 each) | Pass/Fail | Review Latency | Cost | Observations |
 |--------|------|------------|----------------------|------------|--------------------------|-----------|-----------------|------|--------------|
@@ -26,3 +30,21 @@ Records each run of the workflow defined in `docs/prd.md`, scored against
 > exact command you ran and its exact exit code in your report.** Do not modify any
 > file, do not run npm install with --save or --force, and do not push, publish, or
 > deploy anything.
+
+## Backend Test Suite Summary Agent
+
+Workflow defined in `docs/prd-backend-tests.md`, scored against
+`docs/rubric-backend-tests.md`. Added as the second task for Module 1's parallel-agent
+lab.
+
+| Run ID | Date | Agent/Tool | Prompt/Command Used | Cycle Time | Rubric Scores (1-4 each) | Pass/Fail | Review Latency | Cost | Observations |
+|--------|------|------------|----------------------|------------|--------------------------|-----------|-----------------|------|--------------|
+| 001 | 2026-08-26 | Claude Code (`claude -p --allowedTools="Bash,Write" --output-format json`) in container `lab-backend`, worktree `../fashionmate-lab-backend-tests` (branch `lab-backend-tests`), image `agent-sandbox:fashionmate` | Prompt 001 (see below) | 146.75s | Execution Fidelity: 3, Count Accuracy: 3, Evidence Quality: 4, Scope Compliance: 4, Output Completeness: 4 | **PASS** (all dimensions >= 3) | Reviewed immediately after run completion; not separately instrumented | $0.2461 (14 input / 2,579 output / 278,391 cache-read tokens) | Ran in a fresh worktree with no Maven local-repo cache, so most of the 146.75s cycle time is dependency download, not agent reasoning. Result: 23 tests, 22 passed, 1 errored (`FashionmateBackendApplicationTests.contextLoads`, blocked by no live MySQL connection -- an environment issue, same known condition documented in `setup.md`, not a regression). `docs/test-report.md` includes a per-class table and the full quoted Hibernate/JDBC exception chain, and explicitly distinguishes this as environment-only rather than a code defect (Evidence Quality level 4). `git status` showed only the new `docs/test-report.md` -- no source or test file touched (Scope Compliance level 4). Execution Fidelity held at 3, not 4: the report states the command and Maven's textual result (`BUILD FAILURE`) but not a literal numeric shell exit code -- same gap Prompt 002 fixed for the frontend workflow; worth carrying that same instruction into a future prompt revision for this task. |
+
+## Prompt 001 (backend tests, baseline)
+
+> Run the backend test suite. From fashionmate-backend, run mvn test. Report the total
+> number of tests run, how many passed, failed, and errored, and quote the actual
+> failure/error messages for any that did not pass. Save the summary to
+> docs/test-report.md. Do not fix any failing tests. Do not modify any source or test
+> files.
