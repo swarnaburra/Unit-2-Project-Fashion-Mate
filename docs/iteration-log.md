@@ -48,3 +48,28 @@ lab.
 > failure/error messages for any that did not pass. Save the summary to
 > docs/test-report.md. Do not fix any failing tests. Do not modify any source or test
 > files.
+
+## Module 1 Lab: Final State Verification (`git log --oneline`)
+
+Run after merging both `lab-frontend-build` and `lab-backend-tests` into `main`, to
+confirm the commit history shows both parallel workflow branches merged. Note: Git
+auto-merged `docs/iteration-log.md` between the two branches without a conflict --
+their edits landed in non-overlapping regions of the file (a new row appended inside
+the existing frontend table vs. a whole new section appended after it), so no manual
+conflict resolution was actually required for this run of the lab, even though the
+instructions anticipated one might be.
+
+```
+b6f35f5 Merge lab-backend-tests: add backend test report and record run 001
+73e04ab Merge lab-frontend-build: record run 004 in iteration log
+8e58733 docs: add backend test report and record run 001 in iteration log
+37a2f06 docs: record run 004 (frontend build, fresh worktree) in iteration log
+648f69b docs: add PRD and rubric for backend test suite summary agent
+f40be19 Record run 003 (cost-anomaly check) and disable the broken auto-updater
+b399a4b docs: record iteration run 002 in iteration log
+d6a13c8 docs: record baseline run 001 in iteration log
+e4b0aaf docs: add iteration log for single-agent workflow
+3583d78 docs: add rubric and scoring guide for single-agent workflow
+5ecd884 docs: add PRD for single-agent workflow
+dd0c2cc Record parallel session results in the orchestration log
+```
