@@ -39,8 +39,11 @@ omitted?
 - **3 -- Meets**: Every failure/error mentioned is quoted or accurately paraphrased, and
   none present in the output are silently omitted.
 - **4 -- Exceeds**: Same as level 3, and the agent distinguishes expected/environment-
-  only failures (e.g. the known `contextLoads()` DB-connection block) from genuine
-  regressions.
+  only failures from genuine regressions -- correctly, for the invocation actually
+  used (see `docs/prd-backend-tests.md`'s Trigger/Decision Events): a `contextLoads()`
+  `Connection refused` is expected/environment-only in the plain container, but is a
+  genuine regression if it happens against the `docker-compose.yml` invocation, which
+  has a live `mysql` sidecar reachable.
 
 ## 4. Scope Compliance
 
@@ -70,6 +73,16 @@ Does `docs/test-report.md` actually exist after the run and contain a usable sum
 ## Pass Threshold
 
 A run **passes** if all five dimensions score >= 3.
+
+**N/A scoring:** a dimension may be logged as `N/A` instead of 1-4 only when the run
+being scored was not a narrowly-scoped agent invocation confined to this PRD's Actions
+(e.g. a broader, explicitly-requested infrastructure task that happened to include
+running `mvn test` as part of verifying it, rather than a `claude -p` invocation scoped
+to just `cd` + `mvn test`). In that case, the dimension the broader scope legitimately
+required exceeding -- typically Scope Compliance -- is marked `N/A` rather than scored
+1-4, and the run still **passes** if every dimension that *was* scored is >= 3. The
+observation for that run must state why the dimension doesn't apply; `N/A` is never a
+substitute for a low score on a dimension the PRD's narrow scope actually governs.
 
 ## Iteration Log Fields
 
