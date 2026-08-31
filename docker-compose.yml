@@ -1,0 +1,42 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: fashionmate_db
+    networks:
+      - fashionmate-internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # No `ports:` published -- only reachable from other containers on
+    # fashionmate-internal, not from the host or outside the compose network.
+
+  agent:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    volumes:
+      - claude-auth:/claude-auth
+      - .:/workspace
+    working_dir: /workspace
+    networks:
+      - fashionmate-internal
+    stdin_open: true
+    tty: true
+    command: claude
+
+networks:
+  fashionmate-internal:
+    driver: bridge
+
+volumes:
+  claude-auth:

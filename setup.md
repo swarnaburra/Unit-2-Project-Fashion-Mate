@@ -66,6 +66,48 @@ Verified afterward:
   (`/tmp/...` scratch files, `/root/.claude/*` and `/root/.npm/_logs` session/tool
   bookkeeping) -- nothing outside `/workspace` or `/claude-auth` was touched.
 
+## Running Backend Tests Against a Live Database (MySQL Sidecar)
+
+`FashionmateBackendApplicationTests.contextLoads` boots the full Spring context, which
+needs a live MySQL connection to build Hibernate's `EntityManagerFactory`. The plain
+`agent-sandbox:fashionmate` container (used for the smoke test and the Frontend/Backend
+Verification Agent workflows above) has no database reachable from it, so that one test
+errors with `Connection refused` -- documented as an expected, environment-only failure
+in `docs/test-report.md`.
+
+`docker-compose.yml` adds a MySQL sidecar for tasks that genuinely need `mvn test` to
+exercise the real database:
+
+```powershell
+$env:DB_PASSWORD = "your_mysql_password"
+$env:GEMINI_API_KEY = "your_gemini_api_key"
+docker compose run --rm agent
+```
+
+Inside the container, `fashionmate-backend` will connect to the `mysql` service
+(resolved by Docker's internal DNS, not `localhost`) using the `DB_HOST=mysql` env var
+compose sets automatically. Run the suite as usual:
+
+```bash
+cd fashionmate-backend && mvn test
+```
+
+**Isolation notes:**
+- `mysql` has no `ports:` mapping, so it's reachable only from the `agent` container on
+  the compose-created `fashionmate-internal` network -- not from the host or any other
+  container on the machine.
+- The database is ephemeral: no named volume backs its data directory, so
+  `docker compose down` (or the container exiting after `run --rm`) discards it. Each
+  run starts from a fresh, empty `fashionmate_db` (schema is (re)created by
+  `spring.jpa.hibernate.ddl-auto=update` on startup).
+- Local/IntelliJ usage outside Docker is unaffected: `application.properties` defaults
+  `DB_HOST` to `localhost`, so nothing changes for that workflow -- only the compose
+  environment sets `DB_HOST=mysql`.
+- This still keeps DB credentials out of the image itself (`DB_PASSWORD`/
+  `GEMINI_API_KEY` are read from the host shell's environment by `docker compose`, per
+  the "secrets" security decision below), and out of the sidecar's data directory,
+  since nothing is written to a host bind mount for MySQL.
+
 ## Parallel Agent Sessions (Git Worktrees)
 
 Running two agent sessions against this repo at once requires filesystem isolation, or
@@ -198,9 +240,8 @@ first place.
 **What would be tightened or expanded next, as the project evolves?**
 - Add `DB_USERNAME`/`DB_PASSWORD`/`GEMINI_API_KEY` as env vars (not baked into the image)
   only once a task genuinely needs to run the full app or a Gemini-backed feature.
-- Consider a MySQL sidecar (e.g. via `docker-compose`) scoped to a project-only Docker
-  network, rather than pointing the container at a host-level MySQL instance, if/when
-  DB-backed backend tests need to run inside the agent's environment.
+- ~~Consider a MySQL sidecar~~ -- done, see "Running Backend Tests Against a Live
+  Database" below.
 - Consider `--network none` for tasks that don't need the Claude API or any other network
   access at all (e.g. pure static analysis), to shrink the attack surface further per task.
 - Re-evaluate whether `opencode-ai`, still present from the base image but unused here,
