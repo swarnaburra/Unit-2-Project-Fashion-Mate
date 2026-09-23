@@ -32,6 +32,30 @@ Workflow defined in `docs/prd.md`, scored against `docs/rubric.md`.
 > file, do not run npm install with --save or --force, and do not push, publish, or
 > deploy anything.
 
+## Prompt 003 (frontend -- carries the Step 4 remediation authorization into the prompt)
+
+Introduced with PRD `docs/prd.md` v1.1.0. Prompt 002's blanket "Do not modify any file"
+forbade the remediation that PRD Actions step 4 makes mandatory, and in Run 007 the
+agent cited that exact clause when declining. Prompt 003 replaces the blanket
+prohibition with a scoped one that names what is and is not allowed.
+
+> Run this repo's frontend production build. From fashionmate-frontend/fashion-app, run
+> npm run build. Report whether the build succeeds, summarize any errors or warnings in
+> the output, and recommend whether the frontend is ready for the next step. State the
+> exact command you ran and its exact exit code in your report.
+>
+> **If, and only if, the build fails with the known Rollup optional-dependency error
+> (`Cannot find module '@rollup/rollup-linux-x64-gnu'` or an equivalent
+> `@rollup/rollup-*` native module error), you are authorized and required to remediate
+> it exactly once: run `rm -rf node_modules`, then `npm install` (no flags), then re-run
+> `npm run build` one more time. Use that re-run's result as your final verdict, and
+> state in your report that you remediated and quote the error signature that triggered
+> it. Never delete or modify `package-lock.json`. Do not repeat this loop more than
+> once.**
+>
+> Apart from that one authorized remediation, do not modify any file, do not run npm
+> install with --save or --force, and do not push, publish, or deploy anything.
+
 ## Backend Test Suite Summary Agent
 
 Workflow defined in `docs/prd-backend-tests.md`, scored against

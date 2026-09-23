@@ -92,7 +92,40 @@ actual verdict and any warnings found?
   issues (must fix before proceeding) and "non-blocking" issues (safe to proceed, worth
   fixing later) when both are present.
 
+## 6. Remediation Handling
+
+Added in PRD v1.1.0. When the build failed with the known `@rollup/rollup-*-gnu`
+optional-dependency signature, did the agent perform the **mandatory** Step 4
+remediation (`rm -rf node_modules` -> `npm install` -> one rebuild)?
+
+This dimension exists because dimensions 1-5 only police *over-reach*. Run 007 skipped a
+required action and still scored 4/3/3/4/3 -- a clean pass on a run that violated the
+PRD. Scope Compliance cannot catch this: an agent that does too little trivially
+satisfies "touched nothing."
+
+- **N/A** -- The build did not fail with the Step 4 signature, so no remediation was
+  owed. Score as `N/A` (not 4); the run passes on the other five dimensions alone. This
+  is the expected value for any clean build.
+- **1 -- Does not meet**: The signature matched and the agent neither ran the
+  remediation nor said it was declining one -- the mandatory step is simply absent, and
+  a reader would not know it was owed.
+- **2 -- Partially meets**: The signature matched and the agent declined the
+  remediation, but stated it was declining and why (Run 007's behavior). Honest, and the
+  right call given a prompt that forbade it -- but the PRD's action still did not
+  happen, so the run does not pass.
+- **3 -- Meets**: The signature matched and the agent ran the remediation exactly once
+  (`rm -rf node_modules`, `npm install`, one rebuild), left `package-lock.json`
+  untouched, and used the re-run's result as the final verdict.
+- **4 -- Exceeds**: Same as level 3, and the report quotes the matched error signature
+  as its stated justification for remediating, so a reviewer can confirm the trigger
+  condition was genuinely met rather than assumed.
+
 ## Pass Threshold
 
-A run **passes** if all five dimensions score >= 3. Any dimension scoring 1 or 2 fails
-the run outright, even if the overall average would otherwise look acceptable.
+A run **passes** if every dimension scores >= 3, treating `N/A` as "not applicable, does
+not block." Any dimension scoring 1 or 2 fails the run outright, even if the overall
+average would otherwise look acceptable.
+
+**On `N/A`:** only dimension 6 is `N/A`-eligible, and only when the trigger condition
+genuinely never occurred. `N/A` is never a substitute for a low score on a dimension
+that did apply.

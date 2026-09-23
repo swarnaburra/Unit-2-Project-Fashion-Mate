@@ -1,5 +1,7 @@
 # PRD: Frontend Build Verification Agent
 
+**Version:** 1.1.0 (see Changelog at the bottom)
+
 ## Workflow Description
 
 A single agent runs the frontend's production build inside the sandboxed container
@@ -46,6 +48,12 @@ agent to be invoked.
    build` exactly once more. Report that this remediation was attempted and why, and use
    the result of the re-run as the final result. Do not repeat this remediation loop
    more than once per invocation.
+
+   > **This step is mandatory when the signature matches, not optional.** It must be
+   > carried into the invoking prompt verbatim enough that the agent knows it is
+   > authorized -- a prompt that says only "do not modify any file" *overrides* this step
+   > and the agent will correctly decline to act on it. See Run 007, where exactly that
+   > happened, and the Changelog entry below.
 5. Identify and summarize any errors or warnings present in the (possibly re-run)
    output.
 6. State a clear pass/fail verdict for the build.
@@ -74,3 +82,35 @@ agent to be invoked.
 - If the Step 4 remediation ran, the report explicitly states that it did, and why
   (quoting the matched error signature) -- it is not silently folded into the verdict as
   if the first attempt had succeeded.
+- **Conversely, if the build failed with the Step 4 signature and the remediation did
+  *not* run, that is a failed run** -- the agent under-reached on a mandatory action.
+  Scored by Rubric dimension 6 (Remediation Handling).
+
+## Changelog
+
+### 1.1.0 -- 2026-09-22
+
+One defect, two causes, both observed in Run 007:
+
+**Observed.** With the `@rollup/rollup-linux-x64-gnu` failure reproduced deliberately,
+the agent correctly identified the signature, correctly diagnosed npm/cli#4828 -- and
+then declined the mandatory Step 4 remediation, saying: *"I did not do this myself since
+it falls outside 'do not run npm install with --save/--force' caution and touches
+lockfile/node_modules state -- that's a call for you to make."*
+
+**Cause 1 -- prompt/PRD drift.** Step 4 was added to this PRD in commit `2c56a6c` but was
+never carried into the invoking prompt. Prompt 002 instead says "Do not modify any
+file," which forbids the remediation outright. The agent obeyed the prompt over a PRD it
+cannot see, which is the correct behavior for an agent and a defect in the definition.
+Fixed by Prompt 003, which carries the conditional authorization (and the
+`package-lock.json` prohibition) into the prompt itself.
+
+**Cause 2 -- rubric blind spot.** Every mention of the remediation in `docs/rubric.md`
+penalized running it *wrongly or too often*; none penalized *skipping it when required*.
+Run 007 therefore scored 4/3/3/4/3 -- a clean **PASS** -- while violating a mandatory
+PRD action. Fixed by new Rubric dimension 6 (Remediation Handling), which scores the
+under-reach case and is marked `N/A` when the signature never matched.
+
+### 1.0.0 -- 2026-08-25
+
+Initial PRD. Step 4 remediation added later in commit `2c56a6c`.
