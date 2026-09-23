@@ -1,0 +1,12 @@
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 27.70 s -- in fashionmate_backend.FashionmateBackendApplicationTests
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.909 s -- in fashionmate_backend.controllers.GlamUpControllerTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in fashionmate_backend.controllers.OutfitTipControllerTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.912 s -- in fashionmate_backend.controllers.ReviewControllerTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.204 s -- in fashionmate_backend.controllers.StyleLensControllerTest
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.072 s -- in fashionmate_backend.controllers.UserControllerTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in fashionmate_backend.models.GlamUpTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in fashionmate_backend.models.ImageRequestTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in fashionmate_backend.models.ReviewTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in fashionmate_backend.models.StyleLensTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in fashionmate_backend.models.UserTest
+total=23 failures=0 errors=0

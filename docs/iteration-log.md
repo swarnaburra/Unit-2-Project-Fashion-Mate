@@ -42,6 +42,8 @@ lab.
 |--------|------|------------|----------------------|------------|--------------------------|-----------|-----------------|------|--------------|
 | 001 | 2026-08-26 | Claude Code (`claude -p --allowedTools="Bash,Write" --output-format json`) in container `lab-backend`, worktree `../fashionmate-lab-backend-tests` (branch `lab-backend-tests`), image `agent-sandbox:fashionmate` | Prompt 001 (see below) | 146.75s | Execution Fidelity: 3, Count Accuracy: 3, Evidence Quality: 4, Scope Compliance: 4, Output Completeness: 4 | **PASS** (all dimensions >= 3) | Reviewed immediately after run completion; not separately instrumented | $0.2461 (14 input / 2,579 output / 278,391 cache-read tokens) | Ran in a fresh worktree with no Maven local-repo cache, so most of the 146.75s cycle time is dependency download, not agent reasoning. Result: 23 tests, 22 passed, 1 errored (`FashionmateBackendApplicationTests.contextLoads`, blocked by no live MySQL connection -- an environment issue, same known condition documented in `setup.md`, not a regression). `docs/test-report.md` includes a per-class table and the full quoted Hibernate/JDBC exception chain, and explicitly distinguishes this as environment-only rather than a code defect (Evidence Quality level 4). `git status` showed only the new `docs/test-report.md` -- no source or test file touched (Scope Compliance level 4). Execution Fidelity held at 3, not 4: the report states the command and Maven's textual result (`BUILD FAILURE`) but not a literal numeric shell exit code -- same gap Prompt 002 fixed for the frontend workflow; worth carrying that same instruction into a future prompt revision for this task. |
 | 002 | 2026-08-31 | Claude Code (interactive session, not a scoped `claude -p` invocation) running `docker compose run --rm agent bash -lc "cd fashionmate-backend && mvn test"` against the new `mysql` sidecar service (see `docker-compose.yml`, commit `af9d9d5`), image `agent-sandbox:fashionmate` | Direct verification request ("test it and confirm mvn test passes"), command run: `cd fashionmate-backend && mvn test` | ~76s (Maven's own `Total time: 01:16 min`; excludes one-time image build and DB startup/healthcheck wait) | Execution Fidelity: 3, Count Accuracy: 3, Evidence Quality: 4, Scope Compliance: N/A, Output Completeness: 4 | **PASS** (all scored dimensions >= 3) | Reviewed immediately after run completion; not separately instrumented | Not tracked (interactive session, not a metered `--output-format json` invocation) | Follow-up to Run 001: added a MySQL sidecar via `docker-compose.yml` and parameterized `DB_HOST` in `application.properties` (default `localhost` unchanged for local/IntelliJ use) so `contextLoads` has a real database to connect to. Result: **23 tests, 23 passed, 0 failed, 0 errored, BUILD SUCCESS** -- `contextLoads` now connects via `HikariPool-1` to the `mysql` service and Hibernate auto-creates the full schema. Confirms Run 001's diagnosis was correct: the earlier error was purely an environment limitation, not a code defect -- same test, zero source/test changes, now passes once a database is reachable. Scope Compliance is marked N/A rather than scored: this run was part of a broader, explicitly-requested infrastructure task (adding the sidecar), not a narrowly-scoped agent invocation confined to `cd` + `mvn test`, so the PRD's "touch nothing but `docs/test-report.md`" criterion doesn't apply the same way here -- `application.properties`, `docker-compose.yml`, and `setup.md` were deliberately modified as the point of the task, not as scope creep. Execution Fidelity held at 3: the shell's own exit code for the `docker compose run` invocation wasn't explicitly captured, only Maven's textual `BUILD SUCCESS` -- same gap noted in Run 001. |
+| 003 | 2026-09-22 | Claude Code (`claude -p --allowedTools="Bash,Write" --output-format json`) via `docker compose run --rm agent`, image built from root `Dockerfile`, with the `mysql` sidecar healthy. **PRD v1.0.0** (pre-fix, commit `a22447d`) | Prompt 001 (backend, baseline -- unchanged) | 36s wall (agent `duration_ms` 4.27s) | Execution Fidelity: **1**, Count Accuracy: **1**, Evidence Quality: **1**, Scope Compliance: 3 (vacuous -- see below), Output Completeness: **1** | **FAIL** (4 of 5 dimensions below 3) | Reviewed immediately after run completion; not separately instrumented | $0.00 (0 input / 0 output tokens -- no API call was ever made) | **Baseline run; total misfire.** Invoked exactly as the PRD's Trigger documents. The `mysql` sidecar came up healthy, so the database was never the problem -- the agent died before doing any work: `{"is_error": true, "result": "Not logged in · Please run /login", "total_cost_usd": 0, "num_turns": 1}`. **Root cause:** `docker-compose.yml` declared the credential volume as a bare `claude-auth:` key. Compose namespaces bare volume keys with the project name, so it created and mounted `unit-2-project-fashion-mate_claude-auth` -- an empty volume -- while the OAuth credential actually lives in the un-namespaced `claude-auth` that `setup.md`'s `docker run -v claude-auth:/claude-auth` populates. Confirmed directly: `docker volume ls` showed **both** volumes existed, and mounting each into a throwaway `alpine` showed `claude-auth` holding `.credentials.json` (501 bytes, dated 2026-08-26) while the compose-namespaced one was completely empty. So the compose invocation -- the *only* documented path to the live-DB `contextLoads` scenario -- could never authenticate, and had been silently broken since the sidecar was introduced. This went unnoticed because Backend Run 002 was an *interactive* `docker compose run ... bash -lc "mvn test"` (a shell, no `claude` login needed), never a scoped `claude -p` agent invocation through compose. **Scope Compliance is marked 3 but is vacuously satisfied** and should not be read as a pass signal: a `git status` + `sha1sum docs/test-report.md` diff taken before and after was byte-identical, but only because the agent never executed -- a total no-op trivially "touches nothing." This is a genuine weakness in the rubric, not a credit to the run (see Lesson L1). |
+| 004 | 2026-09-22 | Claude Code (`claude -p --allowedTools="Bash,Write" --output-format json`) via `docker compose run --rm agent`, image built from root `Dockerfile`, with the `mysql` sidecar healthy. **PRD v1.1.0** (fix commit `a765b25`) | Prompt 002 (backend -- adds the exact-command + numeric-exit-code sentence) | 142s wall (agent `duration_ms` 136.3s; `duration_api_ms` 29.8s) | Execution Fidelity: **4**, Count Accuracy: 3, Evidence Quality: 3, Scope Compliance: 3, Output Completeness: **4** | **PASS** (all dimensions >= 3) | Reviewed immediately after run completion; not separately instrumented | $0.2340 (14 input / 2,258 output / 254,698 cache-read / 20,495 cache-creation tokens) | **Rerun of Run 003 after the v1.1.0 fix, same command and conditions.** Both fixes landed. (1) Auth: the agent authenticated and ran to completion (`is_error: false`, `num_turns: 7`, `permission_denials: []`) instead of dying at `Not logged in` -- the `name: claude-auth` pin worked. (2) Execution Fidelity **3 -> 4**: the report now opens with `**Command:** mvn test (run from fashionmate-backend/)` and `**Exit code:** 0`, closing the gap flagged in Runs 001 and 002 -- exactly the lift the same one-sentence change produced for the Frontend agent. Result: 23 tests, 23 passed, 0 failed, 0 errored, BUILD SUCCESS, `contextLoads` connected to the sidecar via HikariPool-1 (context up in 24.88s). Counts **independently verified** by the orchestrator against `target/surefire-reports/*.txt` (summed: total=23, failures=0, errors=0) -- every per-class row in the agent's table matches surefire exactly, so Count Accuracy is a genuine 3 (its ceiling), not a take-the-agent's-word-for-it 3. Scope Compliance verified at file level: `git status` showed only ` M docs/test-report.md`, and `git diff --name-only HEAD -- fashionmate-backend/src` returned zero files; the report also explicitly states "No source or test files were modified as part of this run." **Scored 3 rather than 4 because the other half of the criterion -- "ran no command beyond `cd` and `mvn test`" -- could not be verified**: `--output-format json` returns only the final result, not the tool-call transcript, and `num_turns: 7` implies several calls I cannot enumerate. Evidence Quality capped at 3 because level 4 (distinguishing environment-only failures from genuine regressions) was **unreachable this run** -- zero tests failed, so there was nothing to classify; not an agent shortcoming. **Two regressions/misfires worth flagging.** (a) The report **no longer states which invocation was used** (compose `agent` service + `mysql` sidecar vs. plain container), which the PRD lists as an explicit acceptance criterion; the v1.0.0-era report did say this. Root cause is not the v1.1.0 edit per se -- that criterion has never been carried into *either* prompt, so the agent only ever satisfied it incidentally. One run can't prove the new exit-code sentence crowded it out, so this is logged as a regression *candidate* pending Run 005. (b) Compose printed `Volume claude-auth Creating/Created` even though the volume already existed -- cosmetic adoption messaging, not a re-creation; the credential survived and auth succeeded, confirming it bound the real volume. |
 
 ## Prompt 001 (backend tests, baseline)
 
@@ -62,6 +64,66 @@ agent's Execution Fidelity from 3 to 4.
 > failure/error messages for any that did not pass. **State the exact command you ran and
 > its exact numeric exit code in your report.** Save the summary to docs/test-report.md.
 > Do not fix any failing tests. Do not modify any source or test files.
+
+## Lessons (Teacher/Student Loop)
+
+Generalizable principles extracted from iteration cycles, written to apply to *future*
+agents and rubrics in this repo, not just the one that produced them.
+
+### L1 -- A rubric dimension phrased as "the agent did **not** do X" is passed for free by an agent that did nothing at all.
+
+**Evidence.** Backend Run 003 crashed at `Not logged in` having made zero API calls and
+executed zero commands. Scored against the rubric as written, it earned 1s on the four
+dimensions that measure *work produced* -- but Scope Compliance ("did the agent touch
+only `docs/test-report.md`, and run only `cd` and `mvn test`?") was *satisfied*, because a
+no-op touches nothing and runs nothing. A total failure scored 3 on a safety dimension.
+
+**Why it generalizes.** Every agent rubric tends to mix two kinds of dimension:
+*productive* ("did it do the job") and *restrictive* ("did it stay in bounds").
+Restrictive dimensions are silently conditional on the agent having run at all, and that
+precondition is almost never written down. Any rubric with a restrictive dimension has
+this hole.
+
+**Proposed fix (deferred to v1.2.0 on purpose).** Add a liveness gate to the rubric:
+*restrictive dimensions are scored `N/A -- did not execute` rather than 1-4 whenever the
+run produced no tool calls; a run with any `N/A -- did not execute` automatically fails
+regardless of its other scores.* Not applied in this cycle so it cannot contaminate the
+Run 003 -> 004 comparison; the whole point of the rerun was to change one thing.
+
+### L2 -- Verify the exact invocation the agent uses, not a convenient proxy for it.
+
+**Evidence.** The compose auth defect sat broken from 2026-08-31 to 2026-09-22 while
+looking verified. Backend Run 002 "confirmed the compose path works" -- but it ran
+`docker compose run --rm agent bash -lc "cd fashionmate-backend && mvn test"`, a plain
+shell needing no Claude credential. The PRD's actual documented trigger is
+`docker compose run --rm agent claude -p ...`, which needs one. The proxy exercised
+Compose, the sidecar, networking and Maven, and passed on all of them -- while skipping
+the single component that was broken.
+
+**Why it generalizes.** A proxy check is most tempting exactly where the real invocation
+is slow, costly or interactive -- which is also where the untested delta tends to hide.
+The delta here (`bash -lc` vs `claude -p`) looked like an irrelevant implementation
+detail and was in fact the entire failure surface. Rule: **a run only counts as
+verifying the workflow if it uses the literal command string the PRD's Trigger
+documents.** If a cheaper proxy is used, the log entry must say which component the
+proxy did *not* exercise.
+
+### L3 -- An acceptance criterion that is never mirrored in the prompt is not enforced; it is only graded.
+
+**Evidence.** `docs/prd-backend-tests.md` requires the report to state which invocation
+was used (plain container vs. compose + `mysql` sidecar), because that single fact
+decides whether a `contextLoads` failure is environment-only or a genuine regression.
+Neither Prompt 001 nor Prompt 002 ever asks for it. Run 004's report omitted it, and the
+PRD-era report that *did* include it got there incidentally, not because the agent was
+told to.
+
+**Why it generalizes.** PRD/rubric and prompt drift apart by default: criteria get added
+during review, prompts get edited during execution, and nothing ties them together. A
+criterion that lives only in the rubric measures luck. Rule: **every falsifiable
+acceptance criterion must have a corresponding clause in the prompt, or be explicitly
+marked "orchestrator-verified, not agent-instructed"** -- the way Count Accuracy is
+verified here against `target/surefire-reports/`, which the agent is never asked to
+produce.
 
 ## Module 1 Lab: Final State Verification (`git log --oneline`)
 
