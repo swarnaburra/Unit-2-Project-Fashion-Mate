@@ -1,6 +1,6 @@
 # PRD: Frontend Build Verification Agent
 
-**Version:** 1.1.0 (see Changelog at the bottom)
+**Version:** 1.1.1 (see Changelog at the bottom)
 
 ## Workflow Description
 
@@ -87,6 +87,32 @@ agent to be invoked.
   Scored by Rubric dimension 6 (Remediation Handling).
 
 ## Changelog
+
+### 1.1.1 -- 2026-09-23
+
+Closes the Scope Compliance regression from Run 008 and the older read-only overreach
+that transcript capture exposed in Runs 006-007. Both are the same failure in different
+clothes: **the agent reaching for a tool it was never authorized to use, because the
+definition gave it a duty without giving it a means.**
+
+- **Run 008 (score 1):** ran five `git` commands verifying it had not modified
+  `package-lock.json` -- a duty Prompt 003 created and never assigned an owner.
+- **Runs 006-007 (score 2):** ran `ls` / `cat package.json` / `grep` to orient
+  themselves before building, without flagging it.
+
+**Fix, in Prompt 004:** state the authorized command list as a closed set; name the
+common temptations explicitly (`ls`, `cat`, `grep`, `file`, and *any* `git` command);
+assign scope verification to the orchestrator in so many words; and require the report
+to list every command actually run, with an explicit admission if any fell outside the
+set. That last clause converts an undetectable violation into a self-reported one --
+the agent can always narrate its own commands for free, whereas confirming repository
+state costs an unauthorized tool (see Lesson L5).
+
+**Fix, in Rubric dimension 4:** level 4 previously rewarded making scope compliance
+"self-documenting rather than something the reviewer has to verify independently,"
+while level 1 disqualified any `git` command -- rewarding a goal and forbidding its only
+instrument. Level 4 now means *narrating the commands you ran*, explicitly not
+*inspecting repository state*.
 
 ### 1.1.0 -- 2026-09-22
 

@@ -59,6 +59,39 @@ prohibition with a scoped one that names what is and is not allowed.
 > Apart from that one authorized remediation, do not modify any file, do not run npm
 > install with --save or --force, and do not push, publish, or deploy anything.
 
+## Prompt 004 (frontend -- closes the command-scope hole)
+
+Introduced with PRD `docs/prd.md` v1.1.1. Identical to Prompt 003 plus the final
+paragraph, which names the authorized command set as closed, names the specific
+temptations, assigns scope verification to the orchestrator, and requires the agent to
+narrate its own commands.
+
+> Run this repo's frontend production build. From fashionmate-frontend/fashion-app, run
+> npm run build. Report whether the build succeeds, summarize any errors or warnings in
+> the output, and recommend whether the frontend is ready for the next step. State the
+> exact command you ran and its exact exit code in your report.
+>
+> If, and only if, the build fails with the known Rollup optional-dependency error
+> (`Cannot find module '@rollup/rollup-linux-x64-gnu'` or an equivalent
+> `@rollup/rollup-*` native module error), you are authorized and required to remediate
+> it exactly once: run `rm -rf node_modules`, then `npm install` (no flags), then re-run
+> `npm run build` one more time. Use that re-run's result as your final verdict, and
+> state in your report that you remediated and quote the error signature that triggered
+> it. Never delete or modify `package-lock.json`. Do not repeat this loop more than
+> once.
+>
+> **These are the only commands you may run: `cd`, `npm run build`, and -- only under
+> the remediation condition above -- `rm -rf node_modules` and `npm install`. Do not run
+> any other command. In particular do not explore the repo first (`ls`, `cat`, `grep`,
+> `file`) and do not run any `git` command for any reason -- checking whether files were
+> modified, or whether you stayed in scope, is the orchestrator's job, not yours. The
+> paths above are correct; take them as given. At the end of your report, list every
+> command you actually ran, and if any of them fell outside the authorized set, say so
+> explicitly and explain why.**
+>
+> Apart from that one authorized remediation, do not modify any file, do not run npm
+> install with --save or --force, and do not push, publish, or deploy anything.
+
 ## Backend Test Suite Summary Agent
 
 Workflow defined in `docs/prd-backend-tests.md`, scored against
