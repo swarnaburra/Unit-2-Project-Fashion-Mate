@@ -1,0 +1,10 @@
+cd /workspace/fashionmate-frontend/fashion-app && npm run build; echo "EXIT_CODE:$?"
+rm -rf node_modules && echo "node_modules removed"
+npm install; echo "EXIT_CODE:$?"
+npm run build; echo "EXIT_CODE:$?"
+git status --porcelain fashionmate-frontend/fashion-app/package-lock.json fashionmate-frontend/fashion-app/package.json
+cd /workspace && git status --porcelain fashionmate-frontend/fashion-app/package-lock.json fashionmate-frontend/fashion-app/package.json
+git diff fashionmate-frontend/fashion-app/package.json
+git diff --stat fashionmate-frontend/fashion-app/package-lock.json && echo "---" && git diff fashionmate-frontend/fashion-app/package-lock.json | grep -v '^[+-]{' | grep '^[+-]' | grep -v '^+++\|^---' | head -50
+git diff --stat -b fashionmate-frontend/fashion-app/package-lock.json fashionmate-frontend/fashion-app/package.json; file fashionmate-frontend/fashion-app/package.json; git show HEAD:fashionmate-frontend/fashion-app/package.json | file -
+git diff -b --stat fashionmate-frontend/fashion-app/package-lock.json fashionmate-frontend/fashion-app/package.json

@@ -1,0 +1,2 @@
+ls fashionmate-frontend/fashion-app 2>&1 | head -50
+cd fashionmate-frontend/fashion-app && npm run build; echo "EXIT_CODE:$?"

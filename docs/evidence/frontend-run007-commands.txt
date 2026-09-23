@@ -1,0 +1,2 @@
+cd /workspace/fashionmate-frontend/fashion-app && ls package.json && cat package.json | grep -A5 '"scripts"'
+npm run build; echo "EXIT_CODE=$?"
