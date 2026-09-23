@@ -39,4 +39,11 @@ networks:
     driver: bridge
 
 volumes:
+  # Pinned to the un-namespaced name `claude-auth` on purpose. Without `name:`,
+  # Compose prefixes the project name and mounts `unit-2-project-fashion-mate_claude-auth`
+  # -- a *different*, empty volume from the `claude-auth` that `setup.md`'s
+  # `docker run -v claude-auth:/claude-auth` populates with the OAuth credential.
+  # That mismatch made every `docker compose run --rm agent claude -p ...` invocation
+  # fail with "Not logged in - Please run /login" (see iteration-log Run 003).
   claude-auth:
+    name: claude-auth

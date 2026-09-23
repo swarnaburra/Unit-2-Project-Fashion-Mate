@@ -51,6 +51,18 @@ lab.
 > docs/test-report.md. Do not fix any failing tests. Do not modify any source or test
 > files.
 
+## Prompt 002 (backend tests -- one change: require exact command + exit code)
+
+Introduced with PRD `docs/prd-backend-tests.md` v1.1.0. Identical to Prompt 001 except
+for the bolded sentence, mirroring the Prompt 001 -> 002 change that lifted the Frontend
+agent's Execution Fidelity from 3 to 4.
+
+> Run the backend test suite. From fashionmate-backend, run mvn test. Report the total
+> number of tests run, how many passed, failed, and errored, and quote the actual
+> failure/error messages for any that did not pass. **State the exact command you ran and
+> its exact numeric exit code in your report.** Save the summary to docs/test-report.md.
+> Do not fix any failing tests. Do not modify any source or test files.
+
 ## Module 1 Lab: Final State Verification (`git log --oneline`)
 
 Run after merging both `lab-frontend-build` and `lab-backend-tests` into `main`, to
