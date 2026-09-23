@@ -1,0 +1,12 @@
+google_cred.json
+google_cred.json.json
+*cred*.json
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+application-local.properties
+application-secrets.properties
