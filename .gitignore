@@ -10,3 +10,8 @@ google_cred.json.json
 *.keystore
 application-local.properties
 application-secrets.properties
+credentials.json
+google_cred.json
+token.json
+google_cred.json
+google_cred.json
