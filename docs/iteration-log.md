@@ -347,3 +347,25 @@ e4b0aaf docs: add iteration log for single-agent workflow
 5ecd884 docs: add PRD for single-agent workflow
 dd0c2cc Record parallel session results in the orchestration log
 ```
+- Cycle time:  → 2026-10-10T06:39:57cat (16797 seconds)
+- Review latency: about 3 minutes
+- Cost: not captured. -p mode has no status line. Next run will use --output-format json.
+
+### Misfires
+1. Tools blocked in -p mode. Cause: the agent file lists tools in plain English but has no tools allowlist, so headless tool calls were denied. Affects: Tool invocation accuracy.
+2. Slack message split and cut off. Cause: the agent file sets no limit on the number of emails or the message length. Affects: Output format, Edge case handling.
+
+### Proposed Fixes
+1. File: .claude/agents/email-summarize.md. Add a tools line to the frontmatter listing mcp__gmail__search_emails, mcp__gmail__read_email, mcp__slack__slack_list_channels, mcp__slack__slack_post_message. Fixes misfire 1.
+2. File: .claude/agents/email-summarize.md. Add: "Include at most the 10 most recent unread emails. If there are more, end with +N more unread. Always end with the Total unread line." Fixes misfire 2.
+
+### Corrections the human made
+- Added --allowedTools to the run command so the agent could use Gmail and Slack.
+
+### Setup issues (not agent misfires)
+- Claude Code login expired; logged in again.
+- Gmail MCP server missing from the image; installed with npm and linked build to dist.
+- Gmail OAuth not set up; created credentials.json with the auth command.
+
+### Changes Made
+Pending
