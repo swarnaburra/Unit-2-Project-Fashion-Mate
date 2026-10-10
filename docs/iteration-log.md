@@ -227,6 +227,102 @@ is the proposed v1.1.1 fix. **(2) "Self-documenting" must mean *narrating action
 agent already knows it took*, never *inspecting repository state*** -- an agent can list
 its own commands for free; discovering whether a file changed costs an unauthorized tool.
 
+## Reflection: Task Selection Against the Step 1 Criteria
+
+Written after the backend (Runs 003-004) and frontend (Runs 006-009) iteration cycles,
+assessing both workflows against the four Step 1 criteria: **repeatable workflow, need
+for judgment, evaluability, and scoped tool access**.
+
+A scoping note: both workflows were defined before these cycles (`docs/prd.md` and
+`docs/prd-backend-tests.md`, 2026-08-25/26), so the criteria did not decide *whether* to
+build an agent. They drove four live decisions taken during the cycles: which agent to
+iterate on, **under what condition** to run it, how tightly to scope its tools, and what
+evidence to capture.
+
+### Repeatable workflow
+
+What made A/B comparison possible at all -- attributing a score delta to a prompt change
+requires everything else to hold still.
+
+It drove starting with the **backend** agent: Runs 001-002 had already produced a stable
+result (23 tests, same counts), giving a known baseline; Run 004 reproduced 23/23
+exactly. More consequentially, it drove *manufacturing* repeatability for the frontend.
+Run 006 built cleanly, leaving the Rollup remediation branch unreachable, so the
+documented failure was induced deliberately (platform binaries stashed outside
+`node_modules`) and held identical across Runs 007 and 008. The Remediation Handling
+2 -> 4 delta is attributable to Prompt 003 **only because the condition did not move.**
+
+Held only partially: cost is not repeatable (58% variance on byte-identical prompts,
+Runs 002/003), and neither is *command choice* -- `ls` in 006, `ls`+`cat`+`grep` in 007,
+five `git` commands in 008. That variance is exactly what broke Scope Compliance. The
+workflow is repeatable in **output** and not in **method**.
+
+### Need for judgment
+
+Most useful as a guide to *which condition to test under*, not merely which agent to
+pick.
+
+Run 006 (clean build) required almost no judgment -- exit 0, no warnings, report it --
+and was correspondingly the least informative run of the six. The judgment lives in the
+failure path: does this stack trace match the `@rollup/rollup-*` signature, a decision
+that **gates a destructive action**? Run 008 matched it, quoted npm/cli#4828 as its
+justification, and remediated exactly once. The backend equivalent is whether a
+`contextLoads` failure is an environment limitation or a genuine regression -- a call
+that **inverts** depending on which container it ran in. No static script makes either
+call.
+
+Practical consequence: for green builds this criterion is barely met, and an agent adds
+little over `npm run build; echo $?`. A production shape would let CI handle the green
+case and invoke the agent only on non-zero exit.
+
+### Evaluability
+
+Shaped the evidence capture, and produced the cycle's largest lesson.
+
+Both tasks are evaluable because cheap oracles exist: surefire reports (summed
+independently to 23/0/0), exit codes, `package-lock.json` md5 (`db19c904...` unchanged
+across Run 008's remediation), `git status`. Nothing had to be taken on the agent's word.
+
+The lesson is that evaluability is **not a property a task simply has -- it must be
+instrumented.** Scope Compliance was evaluable in principle (transcripts exist) and
+unevaluated in practice, because `--output-format json` returns only the final result.
+Runs 001-005 scored 4 on a dimension nobody had measured; once transcripts were
+recovered from the `claude-auth` volume, the true scores were 2, 2 and 1 (see L4).
+
+It also governs when **not** to score: Run 009 produced no agent behavior, so it is
+logged BLOCKED rather than FAIL. Scoring a non-run invents a measurement (see L1).
+
+### Scoped tool access
+
+Drove a deliberate asymmetry: `--allowedTools="Bash,Write"` for the backend agent, which
+must write `docs/test-report.md`, versus **`--allowedTools="Bash"` alone** for the
+frontend agent, which reports to stdout. The frontend agent is therefore structurally
+incapable of writing a tracked file regardless of what any prompt says -- enforcement at
+the harness, not the instruction.
+
+Layered underneath: bind mount confined to `/workspace`, no host home / SSH / cloud
+credentials, MySQL sidecar with no published ports. Run 008 executed `rm -rf
+node_modules` -- genuinely destructive -- with a blast radius of one gitignored
+directory.
+
+The gap this cycle exposed: **`Bash` is a single tool granting an unbounded command
+space.** Tool-level scoping said "Bash, yes"; the PRD said "only `cd` and `npm run
+build`." Every Scope Compliance violation recorded here lived in the space between those
+two boundaries, invisible to the tool-permission layer. The specification was
+finer-grained than the enforcement, which is what Prompt 004 (v1.1.1) attempts to close
+from the prompt side, since the harness cannot express it.
+
+### How the four interact
+
+They are not independent, and the dependency runs one way: **evaluability is what lets
+you verify the other three actually held.** Repeatability was confirmed by diffing run
+outputs; judgment by checking the agent's classification against the real stack trace;
+scope only once transcripts were recovered -- and until then, what was being scored was
+a self-report.
+
+Three of the four criteria are properties of the task. **Evaluability is a property of
+the harness**, and when it is wrong, the other three are unfalsifiable claims.
+
 ## Module 1 Lab: Final State Verification (`git log --oneline`)
 
 Run after merging both `lab-frontend-build` and `lab-backend-tests` into `main`, to
