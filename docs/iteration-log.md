@@ -347,7 +347,7 @@ e4b0aaf docs: add iteration log for single-agent workflow
 5ecd884 docs: add PRD for single-agent workflow
 dd0c2cc Record parallel session results in the orchestration log
 ```
-- Cycle time:  → 2026-10-10T06:39:57cat (16797 seconds)
+- Cycle time: 2026-10-10T06:37:27 → 2026-10-10T06:39:57 (150 seconds)
 - Review latency: about 3 minutes
 - Cost: not captured. -p mode has no status line. Next run will use --output-format json.
 
