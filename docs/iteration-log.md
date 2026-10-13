@@ -461,4 +461,12 @@ None.
 None.
 
 ### Changes Made
-Pending
+None this cycle. Judge proposed no diffs; zero-email test deferred to Run 4.
+
+**Judge review (docs/transcripts/run-3-judge-output.txt, judge v0.1.0):**
+- Judge score: 19/20 PASS. Human score: 18/20 PASS.
+- Evidence checked: tool-call counts (1 search, 10 reads, 1 lookup, 1 post) match the 14 turns in the run JSON; timestamp and total of 94 match.
+- Disagreement: Output format compliance. Judge 4, human 3. Judge cited the exact posted text matching the template; human accepts 4 after checking Slack. Final Run 3 score: 19/20.
+- Proposed diffs: 0. Accepted 0, rejected 0.
+- Deferred 1: test the zero-email fallback and odd emails (no subject, long thread), planned for Run 4.
+- Deferred 1: "10 most recent" relies on the search tool's default ordering; no evidence of a problem yet, so revisit only if ordering looks wrong.

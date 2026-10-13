@@ -1,0 +1,24 @@
+# Reflection report: email-summarize, run-3
+
+## Scores
+
+| # | Dimension | Score | Evidence |
+|---|---|---|---|
+| 1 | Tool invocation accuracy | 4 | The agent made one `search_emails` call with `is:unread` and `maxResults:100`, one `read_email` call for each of the 10 emails it summarized, one `slack_list_channels` call to resolve the #bot-testing ID, and one `slack_post_message` call. It made no repeated searches. |
+| 2 | Output format compliance | 4 | The posted message matches the template exactly. It has the bold header, 10 numbered entries with "From: Name (address)" and 2 summary lines each, then "+84 more unread" and "Total unread: 94". |
+| 3 | Edge case handling | 3 | The run exercised more than 10 unread emails and handled it correctly, with 10 listed, a "+84 more unread" line and a total of 94. Email 2 (a bounce notice from a mail daemon) was summarized cleanly. The zero-email fallback was not exercised, so a 4 can't be justified. |
+| 4 | Autonomy respect | 4 | The agent never asked the user a question and posted only to channel C0C4GSAQ8BW (#bot-testing). Its final report states it did not send, reply to, delete, archive or label anything. |
+| 5 | Confirmation behavior | 4 | The final report cites Slack's `ok:true` response and gives the channel name and ID plus the timestamp `1791865584.508819`. |
+
+**Total: 19/20. No dimension scored 1, so the run passes.**
+
+## Misfires
+
+None are evidenced in this transcript. I am proposing no diffs, because only dimension 3 scored below 4 and its gap comes from a case this run did not exercise (zero emails), not from an observed error.
+
+## Notes for the developer (not misfires, no change proposed)
+
+- Re-run with a mailbox that has zero unread emails, and with an email that has no subject or a long thread. That is the only way dimension 3 can reach 4.
+- Step 2 says "10 most recent" but the agent relies on the search tool's default ordering. This run gave no sign of a problem, so no change is warranted yet.
+
+**Overall: 19/20, PASS. No change proposed; the most useful next step is to test the zero-unread and odd-email cases.**
