@@ -413,3 +413,52 @@ None.
 - Fix 1 (unread count): bb4074d — agent: email-summarize v0.2.1
 - Fix 2 (model cost): 5fa4b1c — agent: email-summarize v0.2.2
 - Note: #test does not exist in this Slack workspace; #bot-testing used instead for all runs.
+
+## Run 3 — 2026-10-13 — Rerun after Run 2 fixes
+
+**Agent:** email-summarize v0.2.2
+**Skills active:** none
+**Task:** Fetch unread Gmail messages, summarize each one, post to #bot-testing, and confirm success.
+
+### Comparison with Run 2
+| Dimension | Run 2 | Run 3 | Change |
+|---|---|---|---|
+| Tool invocation accuracy | 3 | 4 | +1 |
+| Output format compliance | 3 | 3 | 0 |
+| Edge case handling | 3 | 3 | 0 |
+| Autonomy respect | 4 | 4 | 0 |
+| Confirmation behavior | 4 | 4 | 0 |
+| **Total** | **17** | **18** | **+1** |
+
+**Result:** PASS (threshold 16). No regressions.
+
+### Score notes
+- Tool invocation accuracy (4): one Gmail search, no redundant count search; 0 permission denials.
+- Output format compliance (3): one message, 10 items, +84 more unread, Total unread: 94.
+- Edge case handling (3): handled more than 10 emails; zero-email case still not tested.
+- Autonomy respect (4): stayed in limits and said so explicitly.
+- Confirmation behavior (4): confirmed with Slack channel ID and timestamp 1791865584.508819.
+
+### Measurements
+- Cycle time: 2026-10-13T04:25:51 → 2026-10-13T04:26:44 (53 seconds; Run 2 was 128 seconds)
+- Review latency: about 2 minutes
+- Cost: $0.45 (Run 2 was $0.94, down 52%). Input 10 + cache-write 103,125 + cache-read 119,588 tokens; output 2,960 tokens; 14 turns. Model: claude-sonnet-5-5.
+
+### Fix verification (from Run 2)
+- Fix 1 (bb4074d, unread count): CONFIRMED. One search, exact total of 94.
+- Fix 2 (5fa4b1c, sonnet model): CONFIRMED. Cost dropped from $0.94 to $0.45 with no quality loss.
+
+### Input differences
+- Inbox had 94 unread (Run 2 had 100+). Same kind of input, so the comparison is fair.
+
+### Misfires
+1. Zero-email fallback has never been tested. Cause: the test inbox always has unread mail, so the "No new emails." path has never run. Affects: Edge case handling (capped at 3).
+
+### Proposed Fixes
+1. Test plan, not the agent file: in Run 4, run the agent with a prompt that searches a label with no unread mail, to exercise the fallback.
+
+### Corrections the human made
+None.
+
+### Changes Made
+Pending
