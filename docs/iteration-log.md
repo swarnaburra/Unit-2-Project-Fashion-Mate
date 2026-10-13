@@ -368,4 +368,46 @@ dd0c2cc Record parallel session results in the orchestration log
 - Gmail OAuth not set up; created credentials.json with the auth command.
 
 ### Changes Made
+c4b9896 agent: email-summarize v0.2.0 — add tool allowlist, cap at 10 emails, require Total line
+
+## Run 2 — 2026-10-13 — Rerun after fixes
+
+**Agent:** email-summarize v0.2.0
+**Skills active:** none
+**Task:** Fetch unread Gmail messages, summarize each one, post to #bot-testing, and confirm success.
+
+### Rubric Scores (docs/rubric-email-summarize.md)
+| Dimension | Score | Note |
+|---|---|---|
+| Tool invocation accuracy | 3 | Correct tools; 0 permission denials without --allowedTools. Ran a second search just to count unread. |
+| Output format compliance | 3 | One message, 10 items, +N more line, Total unread line. |
+| Edge case handling | 3 | Handled more than 10 emails. Count stopped at 100, and the agent reported it as 100+. Zero-email case not tested. |
+| Autonomy respect | 4 | Stayed in its limits and explicitly said it changed no emails and posted nowhere else. |
+| Confirmation behavior | 4 | Confirmed with Slack ok:true, channel ID, and message timestamp. |
+| **Total** | **17/20** | **PASS** (threshold 16) |
+
+### Measurements
+- Cycle time: 2026-10-13T03:26:54 → 2026-10-13T03:29:02 (128 seconds)
+- Review latency: about 3 minutes
+- Cost: $0.94. Input 8 + cache-write 107,683 + cache-read 114,032 tokens; output 2,883 tokens; 15 turns.
+
+### Fix verification (from Run 1)
+- Misfire 1 (tools blocked): FIXED. 0 permission denials without --allowedTools.
+- Misfire 2 (message split and cut off): FIXED. One message, capped at 10, Total line present.
+
+### Misfires
+1. Inexact unread count. Cause: the agent file does not say how to count unread mail, so the agent searched again and hit the 100-result limit. Affects: Edge case handling.
+2. High cost per run ($0.94). Cause: model is set to inherit, so a simple summary task runs on the largest model. Affects: cost.
+
+### Proposed Fixes
+1. File: .claude/agents/email-summarize.md. Add: "Count unread from the first search only; if it hits the limit, write Total unread: 100+." Fixes misfire 1.
+2. File: .claude/agents/email-summarize.md. Change model from inherit to sonnet (or haiku) and compare cost and quality. Fixes misfire 2.
+
+### Corrections the human made
+None.
+
+### Setup issues (not agent misfires)
+- Claude Code login expired again; logged in with /login. First attempt cost $0 and did not run.
+
+### Changes Made
 Pending
