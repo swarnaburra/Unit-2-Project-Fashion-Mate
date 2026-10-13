@@ -15,3 +15,4 @@ google_cred.json
 token.json
 google_cred.json
 google_cred.json
+docs/transcripts/*.jsonl
