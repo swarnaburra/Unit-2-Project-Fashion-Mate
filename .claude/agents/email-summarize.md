@@ -4,7 +4,7 @@ description: Checks unread Gmail messages and posts a summary to the #bot-testin
 tools: mcp__gmail__search_emails, mcp__gmail__read_email, mcp__slack__slack_list_channels, mcp__slack__slack_post_message
 model: inherit
 permissionMode: default
-version: v0.2.0
+version: v0.2.1
 ---
 
 ## Role
@@ -35,7 +35,7 @@ Level 2 (bounded autonomy): run the full task without asking the user, but only 
     +N more unread   (only if there were more than 10)
     Total unread: count
 
-5. Always end the message with the Total unread line.
+5. Always end the message with the Total unread line. Count unread from the first search only; if it hits the result limit, write "Total unread: 100+" and do not search again.
 6. Post that one message to #bot-testing with the Slack MCP server.
 7. Confirm success using the Slack tool's response, and report the channel and message timestamp.
 
