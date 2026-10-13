@@ -2,9 +2,9 @@
 name: email-summarize
 description: Checks unread Gmail messages and posts a summary to the #bot-testing Slack channel. Use when asked to summarize email or send email summaries to Slack.
 tools: mcp__gmail__search_emails, mcp__gmail__read_email, mcp__slack__slack_list_channels, mcp__slack__slack_post_message
-model: inherit
+model: sonnet
 permissionMode: default
-version: v0.2.1
+version: v0.2.2
 ---
 
 ## Role
