@@ -410,5 +410,6 @@ None.
 - Claude Code login expired again; logged in with /login. First attempt cost $0 and did not run.
 
 ### Changes Made
-Pending
+- Fix 1 (unread count): bb4074d — agent: email-summarize v0.2.1
+- Fix 2 (model cost): 5fa4b1c — agent: email-summarize v0.2.2
 - Note: #test does not exist in this Slack workspace; #bot-testing used instead for all runs.
