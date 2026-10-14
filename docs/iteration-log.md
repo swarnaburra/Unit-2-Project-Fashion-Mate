@@ -532,3 +532,30 @@ CLAUDE.md v0.1.1 (commit 1 above): restate from latest block only, drop stale ch
 
 ### Changes Made
 summarize-session v0.1.1 (commit 1 above): include original text of unedited artifacts. Open item: rename the project skill to avoid the name collision with the built-in skill.
+
+## Compaction Run — 2026-10-14 — Style Guide Agent (manual /compact after M3 + audits)
+
+### Comparison with earlier runs
+| Dimension | Baseline | Boundaries | Summary | Compaction | Note |
+|---|---|---|---|---|---|
+| Rule Accuracy | 3 | 3 | 3 | 3 | M5 left "responses" unbolded in Error Handling and claimed compliance; M8 caught it. |
+| Task Adherence | 4 | 4 | 4 | 4 | No redone work, no superseded rules, correct section text after compaction. |
+| Coherence | 4 | 4 | 4 | 4 | Consistent after M8. |
+| **Total** | **11/12** | **11/12** | **11/12** | **11/12** | |
+
+- Context usage: before /compact and after /compact not recorded. The 1M-token window meant the 50% target was not practical; the run stayed well under it.
+
+### Probe results (human-adjusted from the agent's self-assessment)
+1. Original task and rules: PARTIALLY CORRECT. All 7 rules verbatim; original task paraphrased because the compaction summary did not quote it.
+2. Introduction text: FULLY CORRECT. Exact edited text.
+3. Rule changes: FULLY CORRECT. Answered "None."
+4. Work remaining: PARTIALLY CORRECT. Listed Making Requests and Error Handling but added unplanned items (audit questions, approval of Authentication).
+
+### Observations
+- Compaction distorted numeric detail: the summary gave wrong sentence word counts (26, 30, 18 instead of 25, 23, 19). Nothing downstream used them.
+- Errors after compaction were similar to the baseline (a bolding omission plus a false compliance claim), not caused by lost information.
+- M8 made an unrequested style decision ("404 or 400 responses" changed to "a 404 error or a 400 error").
+- Confound: CLAUDE.md boundary policy v0.1.1 was active.
+
+### Changes Made
+CLAUDE.md v0.2.0 (commit 1 above): added Compaction Policy from these probe results.
