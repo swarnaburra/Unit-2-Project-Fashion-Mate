@@ -510,3 +510,25 @@ None this cycle. Judge proposed no diffs; zero-email test deferred to Run 4.
 
 ### Changes Made
 CLAUDE.md v0.1.1 (commit 1 above): restate from latest block only, drop stale change labels, re-check new text, and skip the procedure for read-only questions.
+
+## Summarization Run — 2026-10-14 — Style Guide Agent (summarize at M3, fresh session from summary)
+
+### Comparison with earlier runs
+| Dimension | Baseline | Boundaries | Summary | Note |
+|---|---|---|---|---|
+| Rule Accuracy | 3 | 3 | 3 | 3 bolding problems caught in M8 (Best Practices "body" and "resource", uneven bolding of error causes). |
+| Task Adherence | 4 | 4 | 4 | Removed "In short:" in M4 using only the summary; no superseded rule returned. |
+| Coherence | 4 | 4 | 4 | All sections consistent after M8. |
+| **Total** | **11/12** | **11/12** | **11/12** | Violations caught in M8: 5, 1, 3. |
+
+- Context usage: about 5%; never near 50%.
+
+### Observations
+- Distinguished original from updated rules after the fresh start: yes. The summary listed the 7 original rules verbatim, and M4 changes were applied correctly.
+- Summary errors: (1) The first /summarize-session call loaded the image's built-in skill of the same name instead of the project skill, producing a generic summary with no verbatim rules or section text. (2) The corrected summary omitted the original text of the unedited sections, so the fresh session could not edit them until the human supplied it in M4.
+- Verification changed the outcome: without the correction, the fresh session would have had no style guide rules. The human correction added verbatim rules, current section text, and the full list of remaining work.
+- Confound: the CLAUDE.md context boundary policy (v0.1.1) was active during this run.
+- Bolding per section held for the core terms; remaining misses were on new terms in Best Practices.
+
+### Changes Made
+summarize-session v0.1.1 (commit 1 above): include original text of unedited artifacts. Open item: rename the project skill to avoid the name collision with the built-in skill.
