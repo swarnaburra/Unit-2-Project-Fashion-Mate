@@ -1,5 +1,5 @@
 
-# Agent Context Boundary Policy (v0.1.1)
+# Agent Context Boundary Policy (v0.2.0)
 
 ## Purpose
 This file defines how context boundaries are managed in this project.
@@ -24,3 +24,12 @@ Validated against the 8-message blog editing task (baseline 11/12, with boundari
 7. Drop change labels such as (NEW) or (CHANGED) after the phase in which they were introduced.
 8. Before claiming a section complies, re-check any newly written text (for example, a new opening question) against every rule, including passive voice.
 9. The procedure applies to editing and analysis phases, not to read-only questions.
+
+## Compaction Policy
+
+Compaction is a last resort. Proactive summarization (see .claude/skills/summarize-session/SKILL.md) should be triggered before the context window exceeds 60% capacity to avoid relying on compaction. With a 1M-token window, phase changes (such as a rule change) are the more practical trigger, because this task never exceeded about 10%.
+
+Observations from testing:
+- Compaction reliably preserves: the style guide rules verbatim, the current edited text of finished sections, and the fact that no rules had changed yet.
+- Compaction may lose or distort: the user's original task wording (paraphrased), numeric details (the summary reported wrong sentence word counts), and the work-remaining list (it added items that were never planned).
+- Manual compaction should be triggered at: a phase boundary, after running /summarize-session, or at about 60% context if a session runs long.
