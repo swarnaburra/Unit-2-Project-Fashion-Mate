@@ -1,11 +1,14 @@
 ---
 name: summarize-session
 description: Produces a structured summary of the current session's decisions, rule changes, and outstanding work. Use at a natural workflow breakpoint before the context window fills, or when the user asks for a session summary.
+version: v0.1.1
 ---
 
 # Skill: Summarize Session
 
 When this skill is invoked, produce a structured session summary using exactly the format below. Do not paraphrase acceptance criteria or rules -- copy them verbatim from the conversation. Do not omit any modified files or decisions. The summary will be used as the sole context for the next phase of work, so it must be complete and accurate.
+
+For any artifact or section not yet edited, include its original text verbatim, so the next phase can work on it without the prior conversation.
 
 ## SESSION SUMMARY
 
