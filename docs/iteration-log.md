@@ -470,3 +470,23 @@ None this cycle. Judge proposed no diffs; zero-email test deferred to Run 4.
 - Proposed diffs: 0. Accepted 0, rejected 0.
 - Deferred 1: test the zero-email fallback and odd emails (no subject, long thread), planned for Run 4.
 - Deferred 1: "10 most recent" relies on the search tool's default ordering; no evidence of a problem yet, so revisit only if ordering looks wrong.
+
+## Context Drift Baseline — 2026-10-13 — Style Guide Agent (no context management)
+
+**Setup:** Module 1 container, one fresh Claude Code session, 8 scripted messages, no reminders or corrections.
+
+### Rubric Scores
+| Dimension | Score | Note |
+|---|---|---|
+| Rule Accuracy | 3 | Per-section bolding missed 5 times (Authentication, Making Requests, Error Handling, Best Practices x2) from M3 to M7; all other rules correct. |
+| Task Adherence | 4 | Confirmed the rule change in M4, removed "In short:" immediately, applied the 35-word limit and opening questions afterwards, and updated earlier sections in M6. |
+| Coherence | 4 | After M8, all 5 sections follow the same current rule set. |
+| **Total** | **11/12** | |
+
+- Context usage: M1-M8 all about 4% (1M-token window); never reached 50%, so this workload did not stress context capacity.
+
+### Observations
+- Errors were omissions, not commissions: the agent forgot that bolding resets in each section, but never applied a superseded rule (25 words, "In short:") after M4.
+- Most significant drift: the per-section bolding rule from the original guide was silently dropped from M3 to M7 and caught only by the M8 consistency pass.
+- Mild drift signs: M5 repeated the same question the agent asked in M4; M7 added advice not found in any earlier section despite being asked to synthesize.
+- Strengths: tracked the rule change precisely, removed "In short:" before being asked to revisit, and moved bolding to the new opening questions.
