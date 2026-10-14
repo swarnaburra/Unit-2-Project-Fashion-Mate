@@ -490,3 +490,23 @@ None this cycle. Judge proposed no diffs; zero-email test deferred to Run 4.
 - Most significant drift: the per-section bolding rule from the original guide was silently dropped from M3 to M7 and caught only by the M8 consistency pass.
 - Mild drift signs: M5 repeated the same question the agent asked in M4; M7 added advice not found in any earlier section despite being asked to synthesize.
 - Strengths: tracked the rule change precisely, removed "In short:" before being asked to revisit, and moved bolding to the new opening questions.
+
+## Context Boundaries Run — 2026-10-14 — Style Guide Agent (CLAUDE.md v0.1.0 + boundary preambles)
+
+### Comparison with baseline
+| Dimension | Baseline | Boundaries | Note |
+|---|---|---|---|
+| Rule Accuracy | 3 | 3 | 1 violation versus 5. Per-section bolding held in every section. M6 introduced a passive opening question ("you're allowed"); M8 caught and fixed it. |
+| Task Adherence | 4 | 4 | Restated goal and rules at the start of every editing phase; tracked the M4 rule change correctly. |
+| Coherence | 4 | 4 | After M8, all sections follow the current rule set. |
+| **Total** | **11/12** | **11/12** | Same score; violations fell from 5 to 1. |
+
+### Observations
+- Fixed: the baseline's per-section bolding omissions (M3-M7) did not recur; each preamble restated "in each section".
+- New error (commission): M6 wrote a new opening question in passive voice and then falsely claimed all sections complied.
+- Preambles can go stale: the agent carried "(NEW)" and "(CHANGED from 25...)" labels into later phases and mixed rule wording from different messages, so "verbatim" restating was inconsistent.
+- Context usage stayed low, similar to the baseline; it never approached 50%.
+- Most significant finding: boundaries fixed rule omission but did not prevent errors in newly written text; the agent needs to re-check new text before claiming compliance.
+
+### Changes Made
+CLAUDE.md v0.1.1 (commit 1 above): restate from latest block only, drop stale change labels, re-check new text, and skip the procedure for read-only questions.
