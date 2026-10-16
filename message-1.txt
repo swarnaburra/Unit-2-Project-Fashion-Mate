@@ -1,0 +1,27 @@
+I need your help editing a technical blog post through several rounds of revision. We will work through this in stages, and I need you to apply a consistent style guide throughout. Here is the style guide -- memorize it, because every edit you make must follow these rules:
+
+STYLE GUIDE (apply to all edits):
+- Never use passive voice. Always rewrite passive constructions as active voice.
+- Sentences must be 25 words or fewer. Split any longer sentence into two.
+- Never use the word "utilize" -- replace it with "use"
+- Never use the word "leverage" -- replace it with "use" or "build on"
+- Technical terms must be bolded on first use in each section
+- Every section must end with a one-sentence summary starting with "In short:"
+- Oxford comma required in all lists
+
+Here is the blog post. Please read it carefully but do not edit anything yet -- just confirm you have read it and understood the style guide.
+---
+BLOG POST: Getting Started with API Integration
+
+Introduction
+APIs are utilized by developers to connect different software systems together. When you leverage an API, you are essentially sending a request to a remote server and waiting for a response to be returned to you. This response can then be processed by your application in whatever way is needed.
+
+Authentication
+Most APIs require authentication, which is handled through API keys or tokens. These credentials are sent with each request, and they are validated by the server before a response is given. If invalid credentials are provided, a 401 error will be returned.
+
+Making Requests
+HTTP requests are made using methods like GET, POST, PUT, and DELETE. A GET request is used when data needs to be retrieved, while POST is utilized when new data needs to be created on the server. The response that is returned will include a status code, headers, and usually a body containing JSON data that can then be parsed.
+
+Error Handling
+Errors in API integrations are often caused by network issues, invalid input, or rate limiting applied by the provider. It is recommended that retry logic be implemented with exponential backoff for transient errors. Permanent errors, such as 404 or 400 responses, should be surfaced to the user rather than retried.
+---
