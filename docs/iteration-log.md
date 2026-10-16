@@ -559,3 +559,20 @@ summarize-session v0.1.1 (commit 1 above): include original text of unedited art
 
 ### Changes Made
 CLAUDE.md v0.2.0 (commit 1 above): added Compaction Policy from these probe results.
+
+## Fresh-Context Handoff Run — 2026-10-16 — Style Guide Agent (write-handoff skill, two sessions)
+
+| Dimension | Baseline | Boundaries | Summary | Compaction | Handoff |
+|---|---|---|---|---|---|
+| Rule Accuracy | 3 | 3 | 3 | 3 | 3 |
+| Task Adherence | 4 | 4 | 4 | 4 | 4 |
+| Coherence | 4 | 4 | 4 | 4 | 4 |
+| Total | 11 | 11 | 11 | 11 | 11 |
+
+- Setup: Phase one (M1-M3) in one session, then /write-handoff plus a correction message (add original Making Requests/Error Handling text, full phase-two step list, confirm 7 rules verbatim). Saved as handoff-phase-one.md (commit d568c3b). Phase two in a fresh session with only the handoff file as context.
+- First attempt discarded: pasting Message 1 into Claude Code cut off the style guide and Introduction, so the agent pulled rules from docs/summary-after-m3.md. Fix: Message 1 saved to message-1.txt and the agent told to read it. Second attempt received all 7 rules and all 4 sections.
+- Did phase two orient correctly from the handoff alone? Yes. It restated the edited Introduction/Authentication state, all 7 rules, all 6 phase-two steps, and the gotchas, then waited.
+- Gaps in the handoff that caused problems? None observed. The handoff's "API/APIs count as one term" bolding note carried over; bolding remained the weak rule.
+- Consistency vs baseline: same score (11/12). M6 consistency pass found 2 violations (API not bolded at first use in the new opening questions of Making Requests and Error Handling) vs 5 in the baseline. Rule change applied fully: no "In short:" lines remain, every section opens with a question, 35-word limit respected, Best Practices has 5 paragraphs.
+- Was the boundary visible in output quality? Positively: clean start with no carryover of retired rules. Isolation test passed; the agent said it only had the handoff and could not see phase one's discussion, and did not invent details.
+- Deviations: M6 and the isolation test were queued together, and the isolation test was sent twice; the agent answered once. Bolding could not be verified from terminal copy (formatting lost). Context % not recorded.
