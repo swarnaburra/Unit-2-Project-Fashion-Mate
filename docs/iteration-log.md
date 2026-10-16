@@ -543,7 +543,7 @@ summarize-session v0.1.1 (commit 1 above): include original text of unedited art
 | Coherence | 4 | 4 | 4 | 4 | Consistent after M8. |
 | **Total** | **11/12** | **11/12** | **11/12** | **11/12** | |
 
-- Context usage: before /compact and after /compact not recorded. The 1M-token window meant the 50% target was not practical; the run stayed well under it.
+- Context usage (re-measured 2026-10-15, M1-M3 + audit, no CLAUDE.md loaded): before /compact 43.9k/967k (5%); after /compact 50.2k/967k (5%). Compaction increased usage by ~6k tokens because the conversation was small (~12k message tokens) and the summary plus reloaded context outweighed what it removed. The 50% target was not reachable on a 967k window.
 
 ### Probe results (human-adjusted from the agent's self-assessment)
 1. Original task and rules: PARTIALLY CORRECT. All 7 rules verbatim; original task paraphrased because the compaction summary did not quote it.
