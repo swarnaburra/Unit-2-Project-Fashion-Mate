@@ -67,9 +67,10 @@ duplicates.
  that touches coding standards or architectural constraints. Never
  attempt to write to this directory.
 
-- .memory/reference/ — Read-only. Query by keyword for relevant
- excerpts when you need background context. Do not read the entire
- directory.
+- .memory/reference/ — Read-only. Start from .memory/reference/INDEX.md,
+ which points to large documents elsewhere in the repo and says when to
+ consult each. Read only the relevant document and section. Do not read
+ the entire directory or every indexed document.
 
 ### Write policy
 
@@ -90,6 +91,9 @@ match this project, halt and report the mismatch before doing
 anything else.
 
 ### Knowledge directory protection
+
+The container mounts .memory/knowledge/ and .memory/reference/ read-only
+(`:ro`), so writes fail with "Read-only file system" even as root.
 
 Never modify file permissions in .memory/knowledge/ or .memory/reference/
 without explicit human instruction. If a write there fails (permission

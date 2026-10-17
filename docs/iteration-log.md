@@ -587,6 +587,7 @@ CLAUDE.md v0.2.0 (commit 1 above): added Compaction Policy from these probe resu
 - **Context boundaries:** Boundary A in M3 (Phase 1 complete, new focus, active vs replaced rules, carry table v1 and keep IDs stable). Boundary B in M6 (Phase 2 complete, table v2 in the summary file is authoritative, R3/R4 retired by name, no rule change). The agent also ran the CLAUDE.md Context Boundary Procedure at M1, M3, and M6, and correctly skipped it for read-only questions (M2, M4).
 - **Proactive summary:** M5, end of Phase 2, saved as `docs/context-run/summary-after-phase2.md` (goal, active rules verbatim, retired rules, decisions, full table v2, open questions, next action).
 - **Compaction:** not used. `/context` was 26.9k/967k (3%) at Boundary A and 43.6k/967k (5%) at Boundary B, far below the 60% threshold in the CLAUDE.md Compaction Policy.
+- **Commit SHAs:** `aba59bd` (agent v0.1.0 + pre-session and technique plans, before the run); `1acab48` (summary, final report, session notes, this log entry, after the run).
 - **Artifacts:** `docs/context-run/summary-after-phase2.md`, `docs/context-run/final-report.md`, `docs/context-run/session-notes.md` (message-by-message observations).
 
 | Dimension | Score (1-4) | Evidence |

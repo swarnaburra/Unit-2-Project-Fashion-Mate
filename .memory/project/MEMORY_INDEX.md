@@ -10,11 +10,14 @@ Last updated: 2026-10-17
 
 - `../knowledge/coding-standards.md` — Coding standards for this project (exceptions and error body, 404-not-403, no secrets or passwords in responses, repository naming, Mockito test style, tests for every fix, scope discipline). Human-maintained, read-only. Last reviewed 2026-10-17.
 
+- `../reference/INDEX.md` — Pointers to large, on-demand documents (FEATURES.md, review final report, PRDs, rubrics, iteration log, memory architecture) with when to consult each. Human-maintained, read-only. Last reviewed 2026-10-17.
+
 ## Archived entries
 
 (none yet)
 
 ## Pruning schedule
 
-- Workflow-scoped entries: archived when the branch merges to main
-- Project-scoped entries: reviewed every 90 days
+- Workflow-scoped entries (e.g. decision-001, tied to FEATURES.md item 2): moved to Archived when the feature's final commit merges to main; lasting rules are promoted to knowledge/ by the human first.
+- Project-scoped entries (e.g. decision-002): reviewed by their "Review by" date (90 days); flag any past-due entry and ask before acting on it.
+- Superseded entries: replaced in place (update the existing entry), never duplicated.
