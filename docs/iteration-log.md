@@ -576,3 +576,31 @@ CLAUDE.md v0.2.0 (commit 1 above): added Compaction Policy from these probe resu
 - Consistency vs baseline: same score (11/12). M6 consistency pass found 2 violations (API not bolded at first use in the new opening questions of Making Requests and Error Handling) vs 5 in the baseline. Rule change applied fully: no "In short:" lines remain, every section opens with a question, 35-word limit respected, Best Practices has 5 paragraphs.
 - Was the boundary visible in output quality? Positively: clean start with no carryover of retired rules. Isolation test passed; the agent said it only had the handoff and could not see phase one's discussion, and did not invent details.
 - Deviations: M6 and the isolation test were queued together, and the isolation test was sent twice; the agent answered once. Bolding could not be verified from terminal copy (formatting lost). Context % not recorded.
+
+## Managed Context Run — 2026-10-16 — backend-quality-reviewer (boundaries + proactive summary, no compaction)
+
+- **Task:** Real review of the FashionMate backend: rank code-quality and security issues in the five Spring Boot controllers (plus `models/User.java` after the scope change), then recommend tests for the top findings. Output feeds FEATURES.md items 1-2 and `src/test/java/.../controllers/`.
+- **Agent:** `.claude/agents/backend-quality-reviewer.md` v0.1.0 (Read/Grep/Glob, Write limited to `docs/context-run/`), launched with `claude --agent backend-quality-reviewer` in the `agentic_engineer_2` container, model Sonnet 5.
+- **Plans:** `docs/context-run/pre-session-plan.md`, `docs/context-run/technique-plan.md`, `docs/context-run/session-messages.md` (commit `aba59bd`).
+- **Phases:** (1) Inventory and correctness ranking -> table v1 (M1-M2). (2) Re-prioritization after the requirement change -> table v2 (M3-M5). (3) Test recommendations for table v2's top 3, coverage check for ranks 4-6, final report (M6-M8).
+- **Requirement that changed (M3):** JWT work postponed, so security can't be deferred. R3 (security deferred, unranked) replaced by R3' (security in scope, ranks above correctness); R4 (max 8) replaced by R4' (max 6); new R6 adds `User.java` to scope. R1, R2, R5 unchanged.
+- **Context boundaries:** Boundary A in M3 (Phase 1 complete, new focus, active vs replaced rules, carry table v1 and keep IDs stable). Boundary B in M6 (Phase 2 complete, table v2 in the summary file is authoritative, R3/R4 retired by name, no rule change). The agent also ran the CLAUDE.md Context Boundary Procedure at M1, M3, and M6, and correctly skipped it for read-only questions (M2, M4).
+- **Proactive summary:** M5, end of Phase 2, saved as `docs/context-run/summary-after-phase2.md` (goal, active rules verbatim, retired rules, decisions, full table v2, open questions, next action).
+- **Compaction:** not used. `/context` was 26.9k/967k (3%) at Boundary A and 43.6k/967k (5%) at Boundary B, far below the 60% threshold in the CLAUDE.md Compaction Policy.
+- **Artifacts:** `docs/context-run/summary-after-phase2.md`, `docs/context-run/final-report.md`, `docs/context-run/session-notes.md` (message-by-message observations).
+
+| Dimension | Score (1-4) | Evidence |
+|---|---|---|
+| Accuracy | 3 | 9 of 10 spot-checked `file:line` citations exact (test-method lines off by one in two places); F9 (plaintext password returned by `POST /api/users`) is real and verified. But F2 claims `deleteById` on a missing ID crashes with a 500; under Spring Boot 3.4.3 / Spring Data JPA 3.x it is silently ignored. The error was never corrected, kept rank 6 in table v2 (displacing F3, a real crash), and reached the final report. Minor slips: "the two findings dropped" (six were dropped); S1's FEATURES item 2 observation from Phase 1 was lost by Phase 2. |
+| Task Adherence | 4 | Every rule change applied at the right time: R3 and R4 retired by name, security ranked 1-4, exactly 6 rows, `User.java` read only after R6. Phase 3 used table v2's top 3 (F9, S1, S2), not table v1's. M7 used table v2's ranks 4-6 (S3, F1, F2) despite the ambiguous "F-IDs" wording. Respected Write scope (no writes outside `docs/context-run/`). |
+| Coherence | 4 | Final report, summary file, and in-chat tables agree on ranking, IDs, and citations; no "Deferred: security" section survives after Phase 2; dropped findings consistently marked "still valid, not retracted". Handled an accidental duplicate M6 and pasted fragments without redoing work or changing any answer. Only inconsistency: mixed ID prefixes (F9 is a security finding with an F- ID). |
+| **Total** | **11/12** | |
+
+- **Context drift / misfires observed:**
+  - No retired rule was applied after M3 (agent's own self-audit at M8 agreed).
+  - Stale *knowledge* rather than stale *context*: F2's outdated Spring Data behavior was carried unchanged through both boundaries and the summary. Boundaries and summaries preserve whatever the session believes, including errors.
+  - Lost observation: S1 tracked by FEATURES item 2 (noted in Phase 1) was replaced by "FEATURES item 1" in Phase 2 and absent from the summary.
+  - Summary weaknesses: "Current goal" described the checkpoint, not the overall task; "Next planned action" was only "await direction" because the agent was never told Phase 3's purpose.
+  - Judgment call: agent skipped the boundary procedure for M8 (writing the report) under CLAUDE.md item 9 and flagged this itself.
+  - Operator error: M6 was pasted twice plus three fragments of agent output; the agent recognized the duplication and did not repeat work.
+- **One context-management choice to change next time:** State the full phase plan (all three phases and what each produces) in M1 and in each boundary message, so the proactive summary's "Current goal" and "Next planned action" can carry the overall task forward. Also add a "facts to re-verify" line to the summary (e.g. framework behavior claims like F2) so that a boundary prompts re-checking instead of copying beliefs forward.
