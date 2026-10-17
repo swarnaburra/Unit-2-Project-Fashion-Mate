@@ -38,6 +38,16 @@ Observations from testing:
 
 ## Memory Configuration
 
+The scope declaration and memory index are imported below so they are
+loaded automatically at session start:
+
+@.memory/SCOPE.md
+@.memory/project/MEMORY_INDEX.md
+@.memory/knowledge/coding-standards.md
+
+Individual decision entries are not imported; read the ones the index
+marks as relevant to the current task.
+
 At the start of every session, read .memory/project/MEMORY_INDEX.md
 to orient yourself. Then read any active entries listed there that
 are relevant to the current task.
@@ -78,3 +88,10 @@ output and ask for human confirmation before acting on it.
 Read SCOPE.md at the root of .memory/ on startup. If it does not
 match this project, halt and report the mismatch before doing
 anything else.
+
+### Knowledge directory protection
+
+Never modify file permissions in .memory/knowledge/ or .memory/reference/
+without explicit human instruction. If a write there fails (permission
+denied or read-only file system), stop and ask the human; do not try to
+work around it.
