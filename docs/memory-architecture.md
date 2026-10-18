@@ -1,6 +1,6 @@
 # Memory Architecture
 
-Version: 2 (2026-10-17). Revised after building and testing the system; describes what is actually on disk.
+Version: 3 (2026-10-18). v2 revised the plan to match the built system; v3 adds decisions 003-005 from finishing FEATURES.md item 2.
 
 ## What this workflow needs to remember
 
@@ -47,6 +47,10 @@ Why imports: in the first fresh-session test, CLAUDE.md only *told* the agent to
 **Belongs here (current entries)**
 - `decision-001.md`: feature 2 approach (`findByIdAndUserId` + `delete(review)`, 404 not 403, custom exceptions + one `@RestControllerAdvice` with `{"message": ...}`), rejected alternatives with reasons, current state, next step (ReviewControllerTest only), deferred UserController and `checkUserExist` work, and the no-JDK environment limitation.
 - `decision-002.md`: tests live in a separate tree mirroring source packages (existing Maven `src/test/java`); moving to a top-level `/tests` was rejected because it needs a `pom.xml` change or `mvn test` silently runs nothing. Written by the agent during the write-policy test.
+
+- `decision-003.md`: how backend tests are run (Maven Temurin-21 Docker image from PowerShell, `fashionmate-m2` cache, `contextLoads` excluded) and why the dev container can't run them. Project-scoped.
+- `decision-004.md`: the status mapping for every user/review error (400/409/401/404), no catch-all handler, messages unchanged. Project-scoped; revisit when JWT auth lands.
+- `decision-005.md`: status entry: FEATURES.md item 2 complete, with the gaps it deliberately leaves (F9 password exposure recommended next). Workflow-scoped, 30-day review.
 
 **Does not belong here**
 - The diff or list of changed files (Git records it; a copy goes stale after the next edit).
@@ -125,7 +129,9 @@ Why imports: in the first fresh-session test, CLAUDE.md only *told* the agent to
 | Feature 2 current step, next action, deferred work | Project memory (decision-001) | Changes every step; the notes-free session got this wrong |
 | Rejected approaches for feature 2 | Project memory (decision-001) | Prevents re-debating; expires with the feature |
 | Test layout decision | Project memory (decision-002) | A decision with a 90-day review; could be promoted to a standard later |
-| No JDK in the container | Project memory (decision-001) | Environment state; re-check when the image changes |
+| How and where backend tests run; no JDK in the dev container | Project memory (decision-003) | A tooling decision with a checkable command and baseline; re-check when the image or Java version changes |
+| Error status mapping (400/409/401/404) | Project memory (decision-004) | Concrete, revisable choice tied to the pre-JWT auth design; may be promoted to coding-standards.md once stable |
+| Item 2 done; open gaps and recommended next task | Project memory (decision-005) | Status; short review cycle |
 | Error convention, 404 rule, no secrets, test style | Knowledge file | Stable; human-owned; protected by `:ro` |
 | FEATURES.md, PRDs, rubrics, review report, log | Reference index | Large; consulted only for specific tasks |
 | How to run tests, write a handoff | Skills | Procedures, not memory |
@@ -147,3 +153,4 @@ Checked every memory file before committing:
 1. **Where the "no JDK in the container" fact lives.** It could go in project memory or in a future run-tests skill. I put the limitation in project memory and will keep the procedure in a skill, because the limitation depends on the current Docker image and should be removed when the image changes, while the procedure stays the same. Mixing them would make a stable skill carry stale state.
 2. **How to protect the knowledge directory.** The lesson suggests `chmod -R 444`. I used a read-only Docker bind mount instead, because Claude Code runs as root in this container (root ignores file permissions) and `444` on a directory removes the execute bit, which would block reading the files. The tradeoff is that protection depends on starting the container with the right command, so that command is recorded in the iteration log.
 3. **Instruction vs import for startup loading.** Relying only on the CLAUDE.md instruction "read the index at startup" was simpler but failed the first fresh-session test. Importing the scope, index, and standards with `@` costs about 1-2k tokens per session but makes startup memory reliable; decision entries stay on-demand so that cost doesn't grow with every new entry.
+4. **Where the test-run command lives.** "Run the tests with this Docker command" is procedure-like, so it could be a skill. I recorded it in project memory (decision-003) because the important content is the *choice* (which image, why `contextLoads` is excluded, why not the dev container or Git Bash) and the baseline result, and those change when the environment changes. If test runs become a frequent agent task, the command will move into a run-tests skill and decision-003 will keep only the reasoning.
