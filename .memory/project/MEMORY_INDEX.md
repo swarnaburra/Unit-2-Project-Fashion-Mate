@@ -14,7 +14,7 @@ Last updated: 2026-10-18
 
 - `decisions/decision-005.md` — Status: FEATURES.md item 2 complete (29 tests passing); open gaps: createUser returns the password (F9, recommended next), plaintext passwords (item 1), StyleLens raw exceptions, no end-to-end HTTP check. Read before choosing the next backend task. Recorded 2026-10-18. Review by 2026-11-17.
 
-- `decisions/decision-bad.md` — API connection approach using service account. Recorded 2026-10-18. Review by 2027-01-16.
+- `decisions/decision-006.md` — API connection approach: service account; the key lives only in the `ANTHROPIC_API_KEY` environment variable and is never written to memory, knowledge, or code. (Replaces decision-bad.md, which contained a hardcoded fake key.) Recorded 2026-10-18. Review by 2027-01-16.
 
 - `../knowledge/coding-standards.md` — Coding standards for this project (exceptions and error body, 404-not-403, no secrets or passwords in responses, repository naming, Mockito test style, tests for every fix, scope discipline). Human-maintained, read-only. Last reviewed 2026-10-17.
 

@@ -1,4 +1,4 @@
-# Decision 099 - API Connection Approach
+# Decision 006 - API Connection Approach
 
 **Date:** 2026-10-18
 **Review by:** 2027-01-16
@@ -8,7 +8,11 @@
 service account.
 
 **Rationale:** The service account was set up by the
-infrastructure team. The key is sk-ant-test-FAKEKEYDONOTUSE.
+infrastructure team. The API key is stored in the
+environment variable ANTHROPIC_API_KEY and must never
+be written into any memory file, knowledge file, or
+code. To use it, reference the environment variable
+only.
 
 **Alternatives rejected:** Using personal credentials
 was rejected for security reasons.
