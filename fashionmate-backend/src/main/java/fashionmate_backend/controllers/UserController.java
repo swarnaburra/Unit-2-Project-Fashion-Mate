@@ -1,5 +1,8 @@
 package fashionmate_backend.controllers;
 
+import fashionmate_backend.exceptions.EmailAlreadyInUseException;
+import fashionmate_backend.exceptions.InvalidCredentialsException;
+import fashionmate_backend.exceptions.MissingFieldsException;
 import fashionmate_backend.models.User;
 import fashionmate_backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,18 +43,18 @@ public class UserController {
      *
      * @param request the new user's details from the request body
      * @return the id of the newly created user
-     * @throws Exception if the name, email, or password is missing, or if the
-     *         email is already registered to another user
+     * @throws MissingFieldsException if the name, email, or password is missing (400)
+     * @throws EmailAlreadyInUseException if the email is already registered (409)
      */
     @PostMapping("/signup")
-    public Long signUp(@RequestBody User request) throws Exception {
+    public Long signUp(@RequestBody User request) {
         // Check for the new user's name, email, and password
         if (request.getName() == null || request.getEmail() == null || request.getPassword() == null) {
-            throw new Exception("Add the missing fields");
+            throw new MissingFieldsException("Add the missing fields");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new Exception("Email already in use");
+            throw new EmailAlreadyInUseException("Email already in use");
         }
         final User user = userRepository.save(request);
 
@@ -66,21 +69,21 @@ public class UserController {
      *
      * @param request the login credentials (email and password) from the request body
      * @return the id of the matching user
-     * @throws Exception if the email or password is missing
-     * @throws RuntimeException if no user matches the given email/password combination
+     * @throws MissingFieldsException if the email or password is missing (400)
+     * @throws InvalidCredentialsException if no user matches the given email/password combination (401)
      */
     @PutMapping("/signin")
-    public Long signIn(@RequestBody User request) throws Exception {
+    public Long signIn(@RequestBody User request) {
         //Check for the user's email and password is null or not
         if (request.getEmail() == null || request.getPassword() == null) {
-            throw new Exception("Please enter your correct email and password");
+            throw new MissingFieldsException("Please enter your correct email and password");
         }
 
         final User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword());
         if (user != null) {
             return user.getId();
         } else {
-            throw new RuntimeException("User not found");
+            throw new InvalidCredentialsException("User not found");
         }
     }
 

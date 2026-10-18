@@ -1,5 +1,8 @@
 package fashionmate_backend.controllers;
 
+import fashionmate_backend.exceptions.EmailAlreadyInUseException;
+import fashionmate_backend.exceptions.InvalidCredentialsException;
+import fashionmate_backend.exceptions.MissingFieldsException;
 import fashionmate_backend.models.User;
 import fashionmate_backend.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -38,7 +41,7 @@ class UserControllerTest {
         request.setEmail("jamie@example.com");
 
         assertThatThrownBy(() -> userController.signUp(request))
-                .isInstanceOf(Exception.class)
+                .isInstanceOf(MissingFieldsException.class)
                 .hasMessage("Add the missing fields");
     }
 
@@ -52,12 +55,12 @@ class UserControllerTest {
         when(userRepository.existsByEmail("jamie@example.com")).thenReturn(true);
 
         assertThatThrownBy(() -> userController.signUp(request))
-                .isInstanceOf(Exception.class)
+                .isInstanceOf(EmailAlreadyInUseException.class)
                 .hasMessage("Email already in use");
     }
 
     @Test
-    void signUpSavesNewUserAndReturnsId() throws Exception {
+    void signUpSavesNewUserAndReturnsId() {
         User request = new User();
         request.setName("Jamie");
         request.setEmail("jamie@example.com");
@@ -80,7 +83,7 @@ class UserControllerTest {
         request.setEmail("jamie@example.com");
 
         assertThatThrownBy(() -> userController.signIn(request))
-                .isInstanceOf(Exception.class)
+                .isInstanceOf(MissingFieldsException.class)
                 .hasMessage("Please enter your correct email and password");
     }
 
@@ -93,12 +96,12 @@ class UserControllerTest {
         when(userRepository.findByEmailAndPassword("jamie@example.com", "wrong")).thenReturn(null);
 
         assertThatThrownBy(() -> userController.signIn(request))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(InvalidCredentialsException.class)
                 .hasMessage("User not found");
     }
 
     @Test
-    void signInReturnsIdWhenCredentialsMatch() throws Exception {
+    void signInReturnsIdWhenCredentialsMatch() {
         User request = new User();
         request.setEmail("jamie@example.com");
         request.setPassword("secret");

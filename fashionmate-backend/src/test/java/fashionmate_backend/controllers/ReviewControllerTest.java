@@ -1,5 +1,7 @@
 package fashionmate_backend.controllers;
 
+import fashionmate_backend.exceptions.ReviewNotFoundException;
+import fashionmate_backend.exceptions.UserNotFoundException;
 import fashionmate_backend.models.Review;
 import fashionmate_backend.models.User;
 import fashionmate_backend.repositories.ReviewRepository;
@@ -51,7 +53,7 @@ class ReviewControllerTest {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> reviewController.getReviewById(99L))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("User does not exist");
     }
 
@@ -75,18 +77,46 @@ class ReviewControllerTest {
         when(userRepository.findById(3L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> reviewController.createReview(3L, new Review()))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(UserNotFoundException.class);
 
         verify(reviewRepository, never()).save(any());
     }
 
     @Test
-    void deleteReviewDeletesWhenUserExists() {
+    void deleteReviewDeletesWhenReviewBelongsToUser() {
+        Review review = new Review();
         when(userRepository.findById(4L)).thenReturn(Optional.of(new User()));
+        when(reviewRepository.findByIdAndUserId(10L, 4L)).thenReturn(Optional.of(review));
 
         reviewController.deleteReview(4L, 10L);
 
-        verify(reviewRepository).deleteById(10L);
+        verify(reviewRepository).delete(review);
+    }
+
+    @Test
+    void deleteReviewThrowsNotFoundWhenReviewBelongsToAnotherUser() {
+        // Review 10 exists but is owned by someone else, so the scoped lookup finds nothing.
+        when(userRepository.findById(4L)).thenReturn(Optional.of(new User()));
+        when(reviewRepository.findByIdAndUserId(10L, 4L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> reviewController.deleteReview(4L, 10L))
+                .isInstanceOf(ReviewNotFoundException.class)
+                .hasMessage("Review not found");
+
+        verify(reviewRepository, never()).delete(any());
+        verify(reviewRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteReviewThrowsSameNotFoundWhenReviewDoesNotExist() {
+        when(userRepository.findById(4L)).thenReturn(Optional.of(new User()));
+        when(reviewRepository.findByIdAndUserId(999L, 4L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> reviewController.deleteReview(4L, 999L))
+                .isInstanceOf(ReviewNotFoundException.class)
+                .hasMessage("Review not found");
+
+        verify(reviewRepository, never()).delete(any());
     }
 
     @Test
@@ -94,8 +124,9 @@ class ReviewControllerTest {
         when(userRepository.findById(5L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> reviewController.deleteReview(5L, 10L))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(UserNotFoundException.class);
 
+        verify(reviewRepository, never()).delete(any());
         verify(reviewRepository, never()).deleteById(any());
     }
 }
