@@ -11,7 +11,7 @@ const patterns = fs.readFileSync(patternsFile, 'utf8')
   .split(/\r?\n/)
   .map(l => l.trim())
   .filter(l => l && !l.startsWith('#'))
-  .map(p => new RegExp(p.replace(/\[\[:space:\]\]/g, '\\s'), 'im'));
+  .map(p => new RegExp(p.replace(/\[\[:space:\]\]/g, '\\s').replace(/\[:space:\]/g, '\\s'), 'im'));
 
 let input = '';
 process.stdin.on('data', c => (input += c));
