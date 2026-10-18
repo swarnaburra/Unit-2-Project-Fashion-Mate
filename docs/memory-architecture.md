@@ -1,6 +1,6 @@
 # Memory Architecture
 
-Version: 3 (2026-10-18). v2 revised the plan to match the built system; v3 adds decisions 003-005 from finishing FEATURES.md item 2.
+Version: 4 (2026-10-18). v2 revised the plan to match the built system; v3 added decisions 003-005 from finishing FEATURES.md item 2; v4 reconciles the document with the safeguards added during failure-mode testing (stale memory, scope leak, sensitive data) and adds the Enforcement section.
 
 ## What this workflow needs to remember
 
@@ -19,9 +19,9 @@ Feature: `FEATURES.md` item 2 (review ownership + global error handling), stoppe
 
 | Item | Category | Destination |
 |---|---|---|
-| Feature 2 approach, rejected options, current step, deferred UserController work | Changing project context | `.memory/project/decisions/decision-001.md` |
+| Feature 2 approach and rejected options | Project decision | `.memory/project/decisions/decision-001.md` (current state superseded by decision-005) |
 | Test layout (separate `src/test/java` tree, no `/tests` move) | Project decision | `.memory/project/decisions/decision-002.md` |
-| No JDK/Maven in the container; tests must run elsewhere | Known limitation (changes with the image) | Inside decision-001 (current state section) |
+| No JDK/Maven in the container; how tests are run instead | Known limitation + tooling decision | `.memory/project/decisions/decision-003.md` |
 | Error/exception convention, 404-not-403, no secrets in responses, repository naming, Mockito test style, scope discipline | Stable standards | `.memory/knowledge/coding-standards.md` |
 | FEATURES.md, review report, PRDs, rubrics, iteration log | Large, on-demand documents | Pointed to by `.memory/reference/INDEX.md` |
 | How to run backend tests; how to write a handoff or session summary | Procedures | Skills (`.claude/skills/write-handoff`, `summarize-session`; a run-tests skill is a future addition) |
@@ -45,12 +45,13 @@ Why imports: in the first fresh-session test, CLAUDE.md only *told* the agent to
 **Location:** `.memory/project/` with `MEMORY_INDEX.md` and one file per decision in `decisions/` (`decision-NNN.md`, template: Date, Review by, Status, Scope, Decision, Rationale, Alternatives rejected, plus optional Current state / How to apply).
 
 **Belongs here (current entries)**
-- `decision-001.md`: feature 2 approach (`findByIdAndUserId` + `delete(review)`, 404 not 403, custom exceptions + one `@RestControllerAdvice` with `{"message": ...}`), rejected alternatives with reasons, current state, next step (ReviewControllerTest only), deferred UserController and `checkUserExist` work, and the no-JDK environment limitation.
+- `decision-001.md`: feature 2 approach (`findByIdAndUserId` + `delete(review)`, 404 not 403, custom exceptions + one `@RestControllerAdvice` with `{"message": ...}`) and rejected alternatives with reasons. Its current-state section now points to decision-005 (the original "next step" and deferred work are done).
 - `decision-002.md`: tests live in a separate tree mirroring source packages (existing Maven `src/test/java`); moving to a top-level `/tests` was rejected because it needs a `pom.xml` change or `mvn test` silently runs nothing. Written by the agent during the write-policy test.
 
 - `decision-003.md`: how backend tests are run (Maven Temurin-21 Docker image from PowerShell, `fashionmate-m2` cache, `contextLoads` excluded) and why the dev container can't run them. Project-scoped.
 - `decision-004.md`: the status mapping for every user/review error (400/409/401/404), no catch-all handler, messages unchanged. Project-scoped; revisit when JWT auth lands.
 - `decision-005.md`: status entry: FEATURES.md item 2 complete, with the gaps it deliberately leaves (F9 password exposure recommended next). Workflow-scoped, 30-day review.
+- `decision-006.md`: API connection approach: service account whose key lives only in the `ANTHROPIC_API_KEY` environment variable; records *where* the credential is, never its value. Created as the corrected version of `decision-bad.md` in the sensitive-data exercise.
 
 **Does not belong here**
 - The diff or list of changed files (Git records it; a copy goes stale after the next edit).
@@ -126,7 +127,7 @@ Why imports: in the first fresh-session test, CLAUDE.md only *told* the agent to
 
 | Information | Where | Reason |
 |---|---|---|
-| Feature 2 current step, next action, deferred work | Project memory (decision-001) | Changes every step; the notes-free session got this wrong |
+| Feature 2 current state, open gaps, next action | Project memory (decision-005; decision-001 earlier) | Changes every step; the notes-free session got this wrong |
 | Rejected approaches for feature 2 | Project memory (decision-001) | Prevents re-debating; expires with the feature |
 | Test layout decision | Project memory (decision-002) | A decision with a 90-day review; could be promoted to a standard later |
 | How and where backend tests run; no JDK in the dev container | Project memory (decision-003) | A tooling decision with a checkable command and baseline; re-check when the image or Java version changes |
@@ -137,7 +138,11 @@ Why imports: in the first fresh-session test, CLAUDE.md only *told* the agent to
 | How to run tests, write a handoff | Skills | Procedures, not memory |
 | Changed files, test assertions, Javadoc rationale | Not stored | Already in Git, tests, code |
 | Error output, prompts, scratch notes | Context window | No value after the session |
-| Credentials and tokens | Environment variables | Never in any memory layer |
+| Memory scope declaration (`.memory/SCOPE.md`) | Memory root, imported at startup; human-maintained, agent must not edit | Identifies which project owns the mounted memory directory; the scope check compares it with `git remote -v` before any other memory is used |
+| Credential location (env var name, e.g. `ANTHROPIC_API_KEY`) | Project memory (decision-006) | Records how the credential is accessed without storing its value (env var names are Public, values are Secret) |
+| Review dates (`Review by:`) | Inside each entry file (authoritative); copied in the index for scanning only | The stale-memory check reads the entry's own date; the index copy hid a stale entry in testing |
+| Credential pattern scan | `.git/hooks/pre-commit` (local, unversioned) | Hard stop at commit time; not memory, an enforcement mechanism |
+| Credentials and tokens (values) | Environment variables only | Never in any memory layer (Secret) |
 
 ## Allocation review (2026-10-17)
 
@@ -173,21 +178,63 @@ Before writing anything to a memory file, classify it:
 
 In this project: every current memory file is Public (the GitHub repo holds only design decisions and standards). Names of environment variables (`DB_PASSWORD`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`) are Public; their values are Secret. Email content handled by the email-summarize agent and anything from the MySQL database are Confidential and never go into memory.
 
+### Credential handling
+
+Credential *values* (API keys, database passwords, Slack/Google tokens) are Secret and never appear in `.memory/`, `CLAUDE.md`, code, or docs. Memory may record the *name* of the environment variable that holds a credential and how it is used, as decision-006 does with `ANTHROPIC_API_KEY`. If a secret is found in a memory file, the agent flags it and stops until a human removes it; a real leaked credential must also be revoked and replaced, because it stays in Git history and existing clones.
+
 ### Guardrails
 
 A pre-commit hook at .git/hooks/pre-commit scans
 .memory/ for common credential patterns before each
 commit. If a pattern is found, the commit is blocked.
+See "Enforcement" below for every guard and why it exists.
+
+## Enforcement
+
+Soft guards are instructions in `CLAUDE.md` that the agent is told to follow; they work only if it does. Hard stops are mechanisms that block the action regardless of what the agent decides.
 
 | Guard | Type | Where it lives | What it stops |
 |---|---|---|---|
-| Classification rule in the CLAUDE.md write policy | Soft guard | `CLAUDE.md` > Write policy | The agent writing Confidential or Secret data to memory in the first place (depends on the agent following it) |
-| Pre-commit credential scan | **Hard stop** | `.git/hooks/pre-commit` (not versioned; must be installed by hand on each clone) | Any commit while a file under `.memory/` matches `sk-` (at a word start), `password=`, `secret=`, `token=`, `api_key=`, or `apikey=` (case-insensitive). Exits 1 and lists file, line, and pattern |
-| Stale-memory policy | Soft guard | `CLAUDE.md` > Stale memory policy | Acting on an entry whose `Review by:` date has passed, or that disagrees with the index |
-| Scope verification | Soft guard | `CLAUDE.md` > Scope verification | Using memory whose `SCOPE.md` names another project |
-| Read-only knowledge/reference | **Hard stop** | `:ro` bind mounts in the `docker run` command | Any write to `.memory/knowledge/` or `.memory/reference/` inside the container, even as root |
+| Scope verification | Soft guard | `CLAUDE.md` > Scope verification; identity in `.memory/SCOPE.md` | Reading or applying memory whose `SCOPE.md` names another project |
+| Stale-memory policy | Soft guard | `CLAUDE.md` > Stale memory policy | Acting on an entry whose `Review by:` date has passed, or that disagrees with the index, without human confirmation |
+| Classification check | Soft guard | `CLAUDE.md` > Write policy (first rule) | Writing Confidential or Secret data to memory |
+| Write permissions by layer | Soft guard (project) / Hard stop (knowledge, reference) | `CLAUDE.md` memory layers + `:ro` bind mounts | project/: agent-writable after checking the index; knowledge/ and reference/: read-only |
+| Read-only knowledge/reference | **Hard stop** | `:ro` bind mounts in the `docker run` command | Any write to `.memory/knowledge/` or `.memory/reference/` inside the container, even as root ("Read-only file system") |
+| Pre-commit credential scan | **Hard stop** | `.git/hooks/pre-commit` (local; not versioned) | Any commit while a file under `.memory/` matches `sk-` (at a word start), `password=`, `secret=`, `token=`, `api_key=`, or `apikey=` (case-insensitive); exits 1 listing file, line, and pattern |
 
-Limits of the hook: it checks only `.memory/` (not code or docs), only these patterns (a bare key without a known prefix, a customer name, or a record count would pass), and only commits made on a machine where the hook is installed. It does not remove anything already in Git history: the fake key from the exercise is still in commit `ca2484e`. A real leaked key would have to be revoked and the history rewritten.
+### Why each safeguard exists (evidence from the Iteration Log)
+
+**Startup loading with `@` imports.**
+- Problem: memory must be in context before the first task.
+- Observed (run M1, 2026-10-17): with only an instruction to read the index at startup, a fresh session said it had not read any memory file.
+- Change: `CLAUDE.md` imports `SCOPE.md`, `MEMORY_INDEX.md`, and `coding-standards.md` with `@`; run M2 then reported scope, entries, and standards correctly.
+
+**Stale-memory policy.**
+- Problem: an entry can be wrong while still looking current.
+- Observed (run S1, 2026-10-18): decision-004 was edited to an outdated mapping (bad login -> 404) with `Review by: 2026-09-01`. The agent never opened it and declared "no memory entries are past their review date", reading dates from the index, whose copy still said 2027-01-16.
+- Change: the policy now requires checking each entry's own `Review by:` line before acting, the exact flag message, and waiting for confirmation; it forbids claiming "nothing is stale" without opening every decision file, and treats an entry/index disagreement as stale. In run S2 the agent opened every entry, compared entry vs index vs last commit vs code, and refused to rely on decision-004 until confirmed. The entry was restored from Git.
+
+**Scope verification.**
+- Problem: with the wrong `.memory` mounted, the agent cannot tell another project's decisions from ours.
+- Observed (run L1, 2026-10-18): with project-b's memory mounted (403 via ResponseStatusException), the original check did halt, but it offered to continue "once you confirm", and project-b's index had already entered the context through the `@` import.
+- Change: the scope check is now the first action, compares `SCOPE.md` with the repo (FashionMate, confirmed with `git remote -v`), outputs a fixed `SCOPE MISMATCH:` message, disregards the imported index and standards on a mismatch, and refuses any "confirm and continue". Run L2 halted without an override; run L3 with the correct mount applied only FashionMate's memory.
+- Remaining gap: the `@` imports load memory before any instruction runs, so a wrong mount still puts the other project's index in context. A hard stop would be a launch script or `SessionStart` hook that compares `.memory/SCOPE.md` with `git remote get-url origin` and refuses to start.
+
+**Data classification, credential handling, and the pre-commit hook.**
+- Problem: a secret written into memory persists across sessions and in Git history.
+- Observed (2026-10-18): `decision-bad.md` containing the fake key `sk-ant-test-FAKEKEYDONOTUSE` was indexed and committed (`ca2484e`) with nothing stopping it. `grep -r "sk-"` found it; grepping bare words (`password`, `secret`) produced only false positives from rules *about* secrets.
+- Change: the entry was rewritten as decision-006 pointing to `ANTHROPIC_API_KEY` (`615250e`); the CLAUDE.md write policy begins with a classification check; and the pre-commit hook matches assignment forms (`password=`) and word-initial `sk-` to avoid false positives. It blocked a staged `.memory/test-secret.txt` containing `password=test123` and let the next clean commit through.
+
+**Read-only mounts instead of chmod.**
+- Problem: knowledge files must not be edited by the agent.
+- Observed (2026-10-17): Claude Code runs as root in the container, so `chmod 444` would not stop writes, and `444` on a directory also blocks reading.
+- Change: `:ro` bind mounts; both bash and Claude Code got "Read-only file system" on `touch .memory/knowledge/...`.
+
+### Limits
+
+- Soft guards depend on the agent following `CLAUDE.md`; every one of them was missed or weaker on its first test.
+- The pre-commit hook checks only `.memory/`, only the listed patterns (a bare key, a customer name, or a record count would pass), and only on machines where it is installed by hand; it does not clean history. The fake key is still in commit `ca2484e`; a real one would need revoking and a history rewrite.
+- The `:ro` protection exists only when the container is started with the read-only command.
 
 ## Alternatives considered
 
@@ -195,3 +242,4 @@ Limits of the hook: it checks only `.memory/` (not code or docs), only these pat
 2. **How to protect the knowledge directory.** The lesson suggests `chmod -R 444`. I used a read-only Docker bind mount instead, because Claude Code runs as root in this container (root ignores file permissions) and `444` on a directory removes the execute bit, which would block reading the files. The tradeoff is that protection depends on starting the container with the right command, so that command is recorded in the iteration log.
 3. **Instruction vs import for startup loading.** Relying only on the CLAUDE.md instruction "read the index at startup" was simpler but failed the first fresh-session test. Importing the scope, index, and standards with `@` costs about 1-2k tokens per session but makes startup memory reliable; decision entries stay on-demand so that cost doesn't grow with every new entry.
 4. **Where the test-run command lives.** "Run the tests with this Docker command" is procedure-like, so it could be a skill. I recorded it in project memory (decision-003) because the important content is the *choice* (which image, why `contextLoads` is excluded, why not the dev container or Git Bash) and the baseline result, and those change when the environment changes. If test runs become a frequent agent task, the command will move into a run-tests skill and decision-003 will keep only the reasoning.
+5. **Soft guard vs hard stop for scope.** The scope check could be a CLAUDE.md instruction or a startup script/hook. I kept the instruction (soft guard) because it needed no extra tooling and passed after strengthening, but recorded the hook as the next step because the `@` imports load the wrong project's index before any instruction can run.
