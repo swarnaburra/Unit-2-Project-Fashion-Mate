@@ -81,8 +81,28 @@ Confidential or Secret to any memory layer.
 
 ### Stale memory policy
 
-If a memory entry's review date has passed, flag it in your session
-output and ask for human confirmation before acting on it.
+Before acting on any memory entry, check its review date.
+If the review date has passed:
+1. Do not act on that entry until a human confirms it
+  is still accurate
+2. State clearly in your response: "Memory entry
+  [filename] has a review date of [date], which has
+  passed. Please confirm this is still current before
+  I proceed."
+3. Wait for confirmation before using the entry
+
+This applies to all entries in .memory/project/.
+Knowledge files are maintained by humans directly; flag
+them only if their own "Review by" date has passed.
+
+The authoritative review date is the "Review by:" line
+inside the entry file itself, not the date shown in
+MEMORY_INDEX.md (the index copy can be out of date).
+Never state that no entries are stale unless you have
+opened every file in .memory/project/decisions/ and
+checked its "Review by:" line. If the entry and the
+index disagree on anything (date, status, or content),
+report the mismatch and treat the entry as stale.
 
 ### Scope verification
 
