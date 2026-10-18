@@ -148,6 +148,47 @@ Checked every memory file before committing:
 - **Secrets:** none. coding-standards.md names the environment variable *names* only, never values.
 - **Ownership and review rules:** every entry has Date, Review by, Status, and Scope; knowledge and reference files have Maintained by and Last reviewed.
 
+## Data Classification
+
+Before writing anything to a memory file, classify it:
+
+- **Public** — Safe to commit to the repo and share
+ broadly. Most project decisions and coding standards
+ fall here.
+
+- **Internal** — Safe within the team but not for
+ public repos. Store in a non-committed volume or
+ .gitignore the containing folder.
+
+- **Confidential** — Sensitive business data. Do not
+ store in agent memory. Retrieve from secure systems
+ on demand.
+
+- **Secret** — Credentials, tokens, API keys, PII.
+ Must never appear in any memory file. If the agent
+ encounters a secret during a run, use it for the
+ immediate task only and explicitly do not write it
+ to any memory layer. Reference the environment
+ variable name instead.
+
+In this project: every current memory file is Public (the GitHub repo holds only design decisions and standards). Names of environment variables (`DB_PASSWORD`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`) are Public; their values are Secret. Email content handled by the email-summarize agent and anything from the MySQL database are Confidential and never go into memory.
+
+### Guardrails
+
+A pre-commit hook at .git/hooks/pre-commit scans
+.memory/ for common credential patterns before each
+commit. If a pattern is found, the commit is blocked.
+
+| Guard | Type | Where it lives | What it stops |
+|---|---|---|---|
+| Classification rule in the CLAUDE.md write policy | Soft guard | `CLAUDE.md` > Write policy | The agent writing Confidential or Secret data to memory in the first place (depends on the agent following it) |
+| Pre-commit credential scan | **Hard stop** | `.git/hooks/pre-commit` (not versioned; must be installed by hand on each clone) | Any commit while a file under `.memory/` matches `sk-` (at a word start), `password=`, `secret=`, `token=`, `api_key=`, or `apikey=` (case-insensitive). Exits 1 and lists file, line, and pattern |
+| Stale-memory policy | Soft guard | `CLAUDE.md` > Stale memory policy | Acting on an entry whose `Review by:` date has passed, or that disagrees with the index |
+| Scope verification | Soft guard | `CLAUDE.md` > Scope verification | Using memory whose `SCOPE.md` names another project |
+| Read-only knowledge/reference | **Hard stop** | `:ro` bind mounts in the `docker run` command | Any write to `.memory/knowledge/` or `.memory/reference/` inside the container, even as root |
+
+Limits of the hook: it checks only `.memory/` (not code or docs), only these patterns (a bare key without a known prefix, a customer name, or a record count would pass), and only commits made on a machine where the hook is installed. It does not remove anything already in Git history: the fake key from the exercise is still in commit `ca2484e`. A real leaked key would have to be revoked and the history rewritten.
+
 ## Alternatives considered
 
 1. **Where the "no JDK in the container" fact lives.** It could go in project memory or in a future run-tests skill. I put the limitation in project memory and will keep the procedure in a skill, because the limitation depends on the current Docker image and should be removed when the image changes, while the procedure stays the same. Mixing them would make a stable skill carry stale state.
