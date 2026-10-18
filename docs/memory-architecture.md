@@ -1,6 +1,7 @@
 # Memory Architecture
 
-Version: 4 (2026-10-18). v2 revised the plan to match the built system; v3 added decisions 003-005 from finishing FEATURES.md item 2; v4 reconciles the document with the safeguards added during failure-mode testing (stale memory, scope leak, sensitive data) and adds the Enforcement section.
+Version: 5 (2026-10-18). v5 adds the PreToolUse memory guard and the shared, versioned credential patterns.
+Previous: v4 (2026-10-18). v2 revised the plan to match the built system; v3 added decisions 003-005 from finishing FEATURES.md item 2; v4 reconciles the document with the safeguards added during failure-mode testing (stale memory, scope leak, sensitive data) and adds the Enforcement section.
 
 ## What this workflow needs to remember
 
@@ -200,7 +201,8 @@ Soft guards are instructions in `CLAUDE.md` that the agent is told to follow; th
 | Classification check | Soft guard | `CLAUDE.md` > Write policy (first rule) | Writing Confidential or Secret data to memory |
 | Write permissions by layer | Soft guard (project) / Hard stop (knowledge, reference) | `CLAUDE.md` memory layers + `:ro` bind mounts | project/: agent-writable after checking the index; knowledge/ and reference/: read-only |
 | Read-only knowledge/reference | **Hard stop** | `:ro` bind mounts in the `docker run` command | Any write to `.memory/knowledge/` or `.memory/reference/` inside the container, even as root ("Read-only file system") |
-| Pre-commit credential scan | **Hard stop** | `.git/hooks/pre-commit` (local; not versioned) | Any commit while a file under `.memory/` matches `sk-` (at a word start), `password=`, `secret=`, `token=`, `api_key=`, or `apikey=` (case-insensitive); exits 1 listing file, line, and pattern |
+| Pre-commit credential scan | **Hard stop** | Versioned at `scripts/hooks/pre-commit`; installed with `cp scripts/hooks/pre-commit .git/hooks/pre-commit` | Any commit while a file under `.memory/` matches a pattern in `scripts/hooks/secret-patterns.txt` (case-insensitive); exits 1 listing file and line |
+| PreToolUse memory guard | **Hard stop** | `scripts/hooks/memory-guard.js`, configured in `.claude/settings.json` (`hooks.PreToolUse`, matcher `Write\|Edit\|MultiEdit\|Bash`) | Claude writing a credential into `.memory/` at all: blocks the tool call (exit 2) before the file is created, so the value never reaches disk or Git |
 
 ### Why each safeguard exists (evidence from the Iteration Log)
 
@@ -225,6 +227,11 @@ Soft guards are instructions in `CLAUDE.md` that the agent is told to follow; th
 - Observed (2026-10-18): `decision-bad.md` containing the fake key `sk-ant-test-FAKEKEYDONOTUSE` was indexed and committed (`ca2484e`) with nothing stopping it. `grep -r "sk-"` found it; grepping bare words (`password`, `secret`) produced only false positives from rules *about* secrets.
 - Change: the entry was rewritten as decision-006 pointing to `ANTHROPIC_API_KEY` (`615250e`); the CLAUDE.md write policy begins with a classification check; and the pre-commit hook matches assignment forms (`password=`) and word-initial `sk-` to avoid false positives. It blocked a staged `.memory/test-secret.txt` containing `password=test123` and let the next clean commit through.
 
+**PreToolUse memory guard and shared patterns (v5).**
+- Problem: the only protection against an agent *writing* a secret into memory was the CLAUDE.md classification rule (a soft guard), and the pre-commit patterns only matched assignment forms (`password=`, `sk-`).
+- Observed (2026-10-18, see Iteration Log "Sensitive-Data Storage Exercise"): asked to record a Gemini decision "including those two values" (`TEST_API_KEY_DO_NOT_STORE_12345`, `FakeDbPass-Test-9876`), the agent refused even under pressure, but nothing deterministic stood behind it; both values passed the old pre-commit patterns unchanged.
+- Change: one shared pattern file (`scripts/hooks/secret-patterns.txt`) now feeds both a Claude Code PreToolUse hook that blocks the write before it happens and a versioned pre-commit hook. New patterns catch `key:`/`password:` forms and value-like words containing key/token/secret/pass with 4+ digits, while leaving variable names like `GEMINI_API_KEY` alone.
+
 **Read-only mounts instead of chmod.**
 - Problem: knowledge files must not be edited by the agent.
 - Observed (2026-10-17): Claude Code runs as root in the container, so `chmod 444` would not stop writes, and `444` on a directory also blocks reading.
@@ -233,7 +240,7 @@ Soft guards are instructions in `CLAUDE.md` that the agent is told to follow; th
 ### Limits
 
 - Soft guards depend on the agent following `CLAUDE.md`; every one of them was missed or weaker on its first test.
-- The pre-commit hook checks only `.memory/`, only the listed patterns (a bare key, a customer name, or a record count would pass), and only on machines where it is installed by hand; it does not clean history. The fake key is still in commit `ca2484e`; a real one would need revoking and a history rewrite.
+- Both hooks check only `.memory/` and only the listed patterns (a random key without digits or a known prefix, a customer name, or a record count would pass). The pre-commit hook must be copied into `.git/hooks/` on each clone; the PreToolUse hook travels with `.claude/settings.json` but only guards Claude's own tool calls, not edits made by hand. Neither cleans history. The fake key is still in commit `ca2484e`; a real one would need revoking and a history rewrite.
 - The `:ro` protection exists only when the container is started with the read-only command.
 
 ## Alternatives considered

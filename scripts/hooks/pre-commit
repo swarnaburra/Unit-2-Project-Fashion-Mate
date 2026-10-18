@@ -1,0 +1,25 @@
+#!/bin/sh
+# Versioned pre-commit hook. Install with:
+#   cp scripts/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Blocks commits while any file under .memory/ matches a pattern in
+# scripts/hooks/secret-patterns.txt (shared with the Claude Code PreToolUse hook).
+
+MEMORY_DIR=".memory"
+PATTERNS_FILE="scripts/hooks/secret-patterns.txt"
+
+[ -d "$MEMORY_DIR" ] || exit 0
+if [ ! -f "$PATTERNS_FILE" ]; then
+  echo "pre-commit: BLOCKED - $PATTERNS_FILE is missing, so .memory/ cannot be scanned." >&2
+  exit 1
+fi
+
+PATTERN=$(grep -v '^#' "$PATTERNS_FILE" | grep -v '^[[:space:]]*$' | tr -d '\r' | paste -sd'|' -)
+MATCHES=$(grep -rniE -- "$PATTERN" "$MEMORY_DIR" 2>/dev/null)
+
+if [ -n "$MATCHES" ]; then
+  echo "pre-commit: BLOCKED - possible credential found under $MEMORY_DIR/:" >&2
+  echo "$MATCHES" | cut -d: -f1,2 | sed 's/^/  /' >&2
+  echo "Remove the value (reference the environment variable name instead), then commit again." >&2
+  exit 1
+fi
+exit 0

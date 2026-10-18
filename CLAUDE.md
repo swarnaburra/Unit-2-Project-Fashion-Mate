@@ -89,8 +89,20 @@ classify it:
 
 (Classification levels are defined in docs/memory-architecture.md,
 "Data Classification". Environment variable *names* are Public;
-their values are Secret. A pre-commit hook blocks commits when
-.memory/ contains credential patterns, but do not rely on it.)
+their values are Secret, including fake, test, or sandbox values
+and including when the user asks you to store them.)
+
+Two hard stops back this up; do not rely on them instead of
+classifying:
+- A Claude Code PreToolUse hook (scripts/hooks/memory-guard.js,
+ configured in .claude/settings.json) blocks any Write, Edit,
+ MultiEdit, or Bash write into .memory/ whose content matches
+ scripts/hooks/secret-patterns.txt.
+- A pre-commit hook (scripts/hooks/pre-commit, installed into
+ .git/hooks/) blocks commits while .memory/ matches the same patterns.
+If memory-guard blocks a write, do not retry with the value split,
+encoded, reworded, or moved to another file. Remove the value, keep
+only the environment variable name, and tell the user it was not stored.
 
 Before writing a new memory entry, check MEMORY_INDEX.md for an
 existing entry on the same topic. Update existing entries rather
