@@ -706,3 +706,45 @@ The draft contained `spring.datasource.password=${DB_PASSWORD}`, an env-var plac
 
 **Pass/Fail (rerun 2): Pass.** The agent declined to store the fake key and password (soft guard), the PreToolUse hook blocks the write before any file is created, the pre-commit hook blocks the same value at commit time, and the env-var placeholder false positive is gone.
 **Remaining limits:** patterns are heuristics (a random key without digits or a known prefix would pass); both hooks cover only `.memory/`; the PreToolUse hook guards only Claude's tool calls, not manual edits; the pre-commit hook must be installed per clone; neither cleans history.
+
+## Lesson 4 Lab — 2026-10-19 — Track 1: Built-in agent + project memory
+
+**Start tag:** `lesson-4-lab-start` (= `1a3c78c`).
+**Agent:** Claude Code built-in default agent (status line: Sonnet 5), fresh `claude` sessions in `agentic_engineer_2:latest` with `.memory/knowledge` and `.memory/reference` mounted `:ro`. Tests run on the host with `maven:3.9-eclipse-temurin-21` (decision-003).
+**Why Track 1:** decision-005 already named the next real task (F9: `POST /api/users` returns the password), and the last fresh-session checks showed memory, not agent definitions, was what kept sessions on track. The work needed was a fix plus recording the decisions it produced.
+
+### Work done
+1. **Investigation (agent + me):** while scoping F9, found a bigger leak not in the review report: `Review` and `StyleLens` embed `User`, so `GET`/`POST /api/reviews/{userId}` returned every reviewer's plaintext password. The agent confirmed it and noted StyleLens isn't leaking *today* (its endpoint returns a String).
+2. **Options (agent):** ran the context boundary procedure, checked all six decision files (none stale), and proposed A) `@JsonProperty(access = WRITE_ONLY)` on `User.password`, or B) response DTOs; recommended A as in scope (coding standard 8).
+3. **Decision (me):** A, with B deferred; `@JsonIgnore` rejected (breaks signup/signin request bodies); `POST /api/users` left in place.
+4. **Implementation (agent):** one annotation in `models/User.java`; tests `UserTest.serializingUserOmitsPassword`, `UserTest.deserializingUserStillSetsPassword`, `ReviewTest.serializingReviewOmitsReviewersPassword` (plain JUnit + Jackson, per coding standard 6).
+5. **Verification (me):** `mvn test` in the Maven Docker image: **Tests run: 32, Failures: 0, Errors: 0** (29 before + 3 new). Commit `389a023`.
+6. **Frontend contract (me, reading `fashionmate-frontend/fashion-app/src`):** the UI calls only `/api/users/signup`, `/api/users/signin`, the reviews endpoints, glamup, outfit-tip, and stylelens; it reads only `id`/`name`/`rating`/`comment` from reviews, and treats any non-OK auth response as generic failure. `POST /api/users` is unused by the frontend.
+
+### Misfire observed
+After implementing, the agent updated decision-005 to "**Resolved 2026-10-20**" on its own initiative, before any test had run (it can't run tests in the container):
+> "Memory (reflecting resolved gap, per the 'update existing entries' policy): decision-005.md — marked gap 1 resolved with details."
+
+The write followed the update-don't-duplicate rule, but recorded an unverified claim as fact; had a test failed, the next session would have believed the leak was fixed. (It also used the container's UTC date, a day ahead of local.)
+
+### Memory changes (commit `c09b3a9`)
+- **decision-007 (new, technical):** `User.password` is WRITE_ONLY; rules for future secret fields; the three pinning tests; DTOs deferred, `@JsonIgnore` and endpoint removal rejected.
+- **decision-008 (new):** frontend API contract table (calls, fields, and statuses relied on), consequences for decision-004/007, and the open question "remove `POST /api/users` or route it through signup validation?"
+- **decision-005 (updated):** gap 1 "Resolved and verified 2026-10-19 (32 tests passing)"; new next-step options. **decision-003 (updated):** baseline 32 tests. **MEMORY_INDEX.md:** entries 007-008 added.
+- **CLAUDE.md write policy:** new rule: don't mark work "resolved/done/verified" until tests have run and passed; until then write "implemented, not yet verified (tests not run)".
+- **docs/memory-architecture.md v6:** Layer 1 entries, three allocation rows (password handling, frontend contract, verification status), reasoning for the new rule.
+
+### Fresh-session verification
+Fresh `claude` (no `--continue`), nothing pasted. Prompt: "I want to add GET /api/users/{id} that returns a user's profile for a new frontend page. What should I watch out for, and what would you do first? Don't make any changes."
+Excerpt:
+> "It's currently safe to serialize (password is @JsonProperty(access = WRITE_ONLY) per decision-007)... But per decision-005 gap 5, response DTOs were deliberately deferred — if you add any new sensitive field to User later, a raw-entity response here will leak it..."
+> "Frontend contract (decision-008): confirm exactly what Header.jsx/UserContext will read from the response before locking the shape..."
+> "What I'd do first: resolve the authorization question with you..."
+
+**Result: Pass.** Without being told, it used decision-007 (password already hidden; don't add workarounds), decision-005 gap 5 (DTOs deferred, and this endpoint as a candidate to justify one), decision-008 (check the frontend's actual fetch before locking the response shape), coding standards 1/5/7 (reuse `UserNotFoundException`, `findById`, add a 404 test and a no-password serialization test), and found the matching backlog item through the reference index (FEATURES.md item 5). It asked about authorization before proposing code, consistent with standard 8.
+Gaps: it attributed the ownership pattern to decision-004 (it's decision-001), and didn't mention decision-008's open `POST /api/users` question (not directly relevant to a GET).
+
+### Next
+- Decide the `POST /api/users` question (decision-008).
+- If FEATURES.md item 5 proceeds, decide DTO vs entity for the profile response and update decision-007.
+- Add a run-tests skill so the Docker test command isn't only in memory.
