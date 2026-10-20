@@ -1,6 +1,7 @@
 # Memory Architecture
 
-Version: 5 (2026-10-18). v5 adds the PreToolUse memory guard and the shared, versioned credential patterns.
+Version: 6 (2026-10-19). v6 adds decisions 007-008 from the Lesson 4 lab (password serialization, frontend contract) and the verification-status rule.
+Previous: v5 (2026-10-18) added the PreToolUse memory guard and the shared, versioned credential patterns.
 Previous: v4 (2026-10-18). v2 revised the plan to match the built system; v3 added decisions 003-005 from finishing FEATURES.md item 2; v4 reconciles the document with the safeguards added during failure-mode testing (stale memory, scope leak, sensitive data) and adds the Enforcement section.
 
 ## What this workflow needs to remember
@@ -53,6 +54,9 @@ Why imports: in the first fresh-session test, CLAUDE.md only *told* the agent to
 - `decision-004.md`: the status mapping for every user/review error (400/409/401/404), no catch-all handler, messages unchanged. Project-scoped; revisit when JWT auth lands.
 - `decision-005.md`: status entry: FEATURES.md item 2 complete, with the gaps it deliberately leaves (F9 password exposure recommended next). Workflow-scoped, 30-day review.
 - `decision-006.md`: API connection approach: service account whose key lives only in the `ANTHROPIC_API_KEY` environment variable; records *where* the credential is, never its value. Created as the corrected version of `decision-bad.md` in the sensitive-data exercise.
+
+- `decision-007.md`: `User.password` is `WRITE_ONLY` in Jackson, so it is never serialized (createUser, Review, StyleLens); rules for future secret fields; DTOs deferred, `@JsonIgnore` rejected. Project-scoped.
+- `decision-008.md`: the frontend API contract: which calls the React app makes and exactly which fields and statuses it relies on; `POST /api/users` is unused (open question). Project-scoped; re-check when a controller's shape or the frontend's fetch calls change.
 
 **Does not belong here**
 - The diff or list of changed files (Git records it; a copy goes stale after the next edit).
@@ -134,6 +138,9 @@ Why imports: in the first fresh-session test, CLAUDE.md only *told* the agent to
 | How and where backend tests run; no JDK in the dev container | Project memory (decision-003) | A tooling decision with a checkable command and baseline; re-check when the image or Java version changes |
 | Error status mapping (400/409/401/404) | Project memory (decision-004) | Concrete, revisable choice tied to the pre-JWT auth design; may be promoted to coding-standards.md once stable |
 | Item 2 done; open gaps and recommended next task | Project memory (decision-005) | Status; short review cycle |
+| How passwords are kept out of responses | Project memory (decision-007) | Concrete, checkable choice (one annotation, three named tests); would be easy to undo by accident with a new field or DTO |
+| What the frontend relies on from the backend | Project memory (decision-008) | Not inferable from the backend repo alone (lives in `fashionmate-frontend`); a fresh session would otherwise have to re-read every `.jsx` file |
+| Whether a fix is verified | Inside the entry's Status line (with test count and date) | An agent recorded "Resolved" before tests ran (2026-10-19); CLAUDE.md now requires "implemented, not yet verified" until tests pass |
 | Error convention, 404 rule, no secrets, test style | Knowledge file | Stable; human-owned; protected by `:ro` |
 | FEATURES.md, PRDs, rubrics, review report, log | Reference index | Large; consulted only for specific tasks |
 | How to run tests, write a handoff | Skills | Procedures, not memory |
@@ -231,6 +238,11 @@ Soft guards are instructions in `CLAUDE.md` that the agent is told to follow; th
 - Problem: the only protection against an agent *writing* a secret into memory was the CLAUDE.md classification rule (a soft guard), and the pre-commit patterns only matched assignment forms (`password=`, `sk-`).
 - Observed (2026-10-18, see Iteration Log "Sensitive-Data Storage Exercise"): asked to record a Gemini decision "including those two values" (`TEST_API_KEY_DO_NOT_STORE_12345`, `FakeDbPass-Test-9876`), the agent refused even under pressure, but nothing deterministic stood behind it; both values passed the old pre-commit patterns unchanged.
 - Change: one shared pattern file (`scripts/hooks/secret-patterns.txt`) now feeds both a Claude Code PreToolUse hook that blocks the write before it happens and a versioned pre-commit hook. New patterns catch `key:`/`password:` forms and value-like words containing key/token/secret/pass with 4+ digits, while leaving variable names like `GEMINI_API_KEY` alone.
+
+**Verification-status rule (v6).**
+- Problem: memory can record an unverified claim as fact.
+- Observed (Lesson 4 lab, 2026-10-19): after implementing the password fix, the built-in agent updated decision-005 to "Resolved" on its own initiative, before any test had run (it can't run tests in the container).
+- Change: the CLAUDE.md write policy now requires "implemented, not yet verified (tests not run)" until a human reports passing tests, then the test count and date.
 
 **Read-only mounts instead of chmod.**
 - Problem: knowledge files must not be edited by the agent.

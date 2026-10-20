@@ -104,6 +104,13 @@ If memory-guard blocks a write, do not retry with the value split,
 encoded, reworded, or moved to another file. Remove the value, keep
 only the environment variable name, and tell the user it was not stored.
 
+Record verification status honestly. Do not mark work as
+"resolved", "done", or "verified" in memory until its tests have
+actually run and passed. Until then write "implemented, not yet
+verified (tests not run)", and update the entry with the test
+count and date once a human reports the result. Tests cannot run
+inside this container (no JDK; see decision-003).
+
 Before writing a new memory entry, check MEMORY_INDEX.md for an
 existing entry on the same topic. Update existing entries rather
 than creating new ones. Never write anything classified as

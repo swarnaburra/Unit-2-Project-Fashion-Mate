@@ -9,7 +9,7 @@
 
 `docker run --rm -v "${PWD}\fashionmate-backend:/app" -v fashionmate-m2:/root/.m2 -w /app maven:3.9-eclipse-temurin-21 mvn test "-Dtest=!FashionmateBackendApplicationTests" "-Dsurefire.failIfNoSpecifiedTests=false"`
 
-Baseline on 2026-10-18: 29 tests, 0 failures, 0 errors, BUILD SUCCESS (~44 s on first run, including downloads).
+Baseline: 2026-10-18 29 tests; 2026-10-19 32 tests (after decision-007), 0 failures, 0 errors, BUILD SUCCESS (~44 s on the first run including downloads, faster once `fashionmate-m2` is warm).
 
 **Rationale:** The `agentic_engineer_2` dev container has no JDK or Maven, and `fashionmate-backend/.mvn/wrapper/maven-wrapper.properties` is missing, so `./mvnw test` fails everywhere. `pom.xml` sets `java.version` 21, so the image must be a Temurin 21 one. `contextLoads` needs a live MySQL database (see the comment in the test and `docs/prd-backend-tests.md`), so it fails with "Connection refused" without one; excluding it keeps the unit-test result meaningful. The named volume avoids re-downloading ~100 MB of dependencies each run.
 
