@@ -814,3 +814,13 @@ Source: Run 1 transcript (decision-005 gap 3), classified by the lesson's four d
 
 ### Fix applied: tester v1.1.0 (Misfire 1)
 - `.claude/agents/tester.md` 1.0.0 -> 1.1.0: step 2 now says run only the listed commands "exactly as written", "never run any other command, including to check the environment (no `which`, `docker`, `java`, `ls`, `mvn -v`, or similar probes)", and for backend changes "report `NOT RUN - needs human` immediately, without running anything", citing decision-003.
+
+### Rerun (tester phase only, tester v1.1.0) — 2026-10-20
+- Prompt: "Rerun only the tester phase of the change workflow for decision-005 gap 3 (backend changes in StyleLensController.java, GlobalExceptionHandler.java, InvalidUserIdException.java, and their tests). Don't run any other phase. Report the tester's result exactly."
+- Orchestrator: ran the context boundary procedure, scoped the run to the tester only (no planner, implementer, reviewer, or memory-keeper), and invoked the tester.
+- Result: the tester finished in **27 s** (v1.0.0 took 2 min 29 s) and **no Bash permission prompt appeared**: no `which`, `docker`, `java`, or `ls` probe. Excerpt:
+  > "Verdict: NOT RUN - needs human. Reason: no JDK / working Maven wrapper in this container (decision-003)."
+  > "...it did not attempt to run tests or any environment probes — it reports the verdict directly per its instructions."
+  It gave the decision-003 host command and explicitly refused to treat the prior 34-test baseline as a substitute: "a fresh run and pasted output are required before this can be marked PASS."
+- **Fix holds.** The no-JDK case now goes straight to the Wait branch using memory, not probes.
+- Watch for: no regression in other phases (none were run). The limit is still instruction-only; a hard stop (PreToolUse allowlist for the tester's `Bash`) remains the Module 4 candidate. Misfires 2 and 3 are still open for the next iteration.
