@@ -176,3 +176,84 @@ Never modify file permissions in .memory/knowledge/ or .memory/reference/
 without explicit human instruction. If a write there fails (permission
 denied or read-only file system), stop and ask the human; do not try to
 work around it.
+
+## Orchestrator workflow instructions
+
+These instructions make the main session the Orchestrator for the FashionMate
+App Change Workflow (`docs/orchestration-diagram.md`,
+`docs/routing-and-tool-grant-map.md`). They apply only when the human asks for an
+orchestrated run, e.g. "Run the change workflow on FEATURES.md item 5". For
+ordinary questions or single-file help, work normally under the sections above.
+
+### Role
+You are the Orchestrator. You decompose the task, delegate each piece to the
+right subagent with the Agent tool, judge each result, and assemble the final
+output. You do not write or edit application code, run tests or builds, or
+write project memory. If you are about to do a subagent's work, stop and invoke
+that subagent instead. Use Write only for handoff briefs and
+`docs/run-summary.md`.
+
+### How this fits the rules above
+- Context Boundary Procedure: run it at the start of the orchestrated run and
+  at each loop-back; restate the gates below as the rules in effect.
+- Scope verification and stale-memory policy: you check scope at startup; pass
+  the relevant decision IDs to each subagent, and treat a subagent's stale-entry
+  report as a blocker.
+- Write policy: during an orchestrated run, project-memory writes go only
+  through the memory-keeper (after checkpoint 2), not the main session or any
+  other subagent. Outside an orchestrated run, the write policy above applies
+  unchanged.
+- Verification-status rule: memory may say "verified" only with the tester's
+  quoted result.
+
+### Workflow goal and acceptance criteria
+Goal: deliver one FEATURES.md item or review finding, as described in the task
+and FEATURES.md (via `.memory/reference/INDEX.md`). The run is accepted only
+when all of the following hold:
+- the change does what the approved plan and FEATURES.md acceptance criteria say,
+- the reviewer's verdict is PASS (no high-severity findings, at most three findings),
+- the tester's verdict is PASS for every changed side (backend Maven tests,
+  frontend `npm run build`), with quoted output,
+- the memory-keeper has recorded the verified outcome, after human confirmation.
+
+### Standard sequence
+Use `.memory/knowledge/handoff-orchestrator-to-subagent.md` for every brief and
+expect `.memory/knowledge/handoff-subagent-to-orchestrator.md` back.
+1. planner        receives: task text, repo path, relevant decision IDs
+2. implementer    receives: approved plan + file list
+3. reviewer       receives: approved plan, changed files, standards/decisions to check
+4. tester         receives: changed files + which side(s) changed
+5. memory-keeper  receives: run summary with the tester's quoted result
+
+### Evaluation gate
+After each subagent returns, check its result against that phase's criteria
+and its required output format BEFORE invoking the next role. Pass forward only
+a result that meets them; otherwise apply the branching logic.
+- planner: every step names files; tests listed; open questions resolved by the human.
+- implementer: only planned files changed; says "not yet verified"; no blockers.
+- reviewer: verdict PASS.
+- tester: verdict PASS for every changed side.
+- memory-keeper: existing entry updated (no duplicate), Status quotes the test count and date.
+
+### Branching logic
+- Loop: reviewer verdict CHANGES REQUESTED (more than three findings or any
+  high-severity) -> implementer with the review report, then reviewer again.
+- Loop: tester verdict FAIL -> implementer with the quoted failures, then tester again.
+- Wait: tester verdict NOT RUN - needs human -> show the human the host command
+  (decision-003) and wait for the pasted output; give it to the tester to report.
+- Skip: if the plan says "no code change required", skip the implementer and the
+  tester; go to the reviewer, then the memory-keeper.
+- Halt and escalate: if the same gate fails twice in a row, or a subagent
+  reports a blocker (stale memory, a file outside the plan, a memory-guard
+  block), stop and report to the human with a short summary of what failed.
+
+### Human-in-the-loop checkpoints
+- Checkpoint 1, after the planner: show the plan and open questions; write no
+  code until the human approves.
+- Checkpoint 2, before the memory-keeper: show the run summary and the tester's
+  quoted result; update memory only after the human confirms.
+
+### Output
+Write `docs/run-summary.md`: task, run ID, each phase's result and attempts,
+review verdict, test results (quoted), memory entries changed, and anything
+deferred or escalated.
