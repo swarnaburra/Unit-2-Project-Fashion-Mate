@@ -2,6 +2,8 @@ package fashionmate_backend.controllers;
 
 import com.google.genai.Client;
 import com.google.genai.types.*;
+import fashionmate_backend.exceptions.InvalidUserIdException;
+import fashionmate_backend.exceptions.UserNotFoundException;
 import fashionmate_backend.models.ImageRequest;
 import fashionmate_backend.models.StyleLens;
 import fashionmate_backend.models.User;
@@ -44,19 +46,25 @@ public class StyleLensController {
      * @param imageRequest the request body containing the base64 image
      *        contents, its mimetype, and the occasion/age/preference context
      * @return the raw text response returned by the Gemini model
-     * @throws Exception if no user exists with the given {@code userId}, or if
-     *         the underlying Gemini request fails
+     * @throws InvalidUserIdException if {@code userId} cannot be parsed as a valid id
+     * @throws UserNotFoundException if no user exists with the given {@code userId}
      */
     @PostMapping("/processImage/{userId}")
     public String processImage(@PathVariable String userId,
-                               @RequestBody ImageRequest imageRequest) throws Exception {
+                               @RequestBody ImageRequest imageRequest) {
 
+        final Long parsedUserId;
+        try {
+            parsedUserId = Long.valueOf(userId);
+        } catch (NumberFormatException e) {
+            throw new InvalidUserIdException("Invalid user id");
+        }
 
         //Lookup user using user id
-        final Optional<User> user = userRepository.findById(Long.valueOf(userId));
+        final Optional<User> user = userRepository.findById(parsedUserId);
 
         if(user.isEmpty()) {
-            throw new Exception("Wrong user");
+            throw new UserNotFoundException("User does not exist");
         }
 
         //create prompt

@@ -1,5 +1,7 @@
 package fashionmate_backend.controllers;
 
+import fashionmate_backend.exceptions.InvalidUserIdException;
+import fashionmate_backend.exceptions.UserNotFoundException;
 import fashionmate_backend.models.ImageRequest;
 import fashionmate_backend.repositories.StyleLensRepository;
 import fashionmate_backend.repositories.UserRepository;
@@ -36,9 +38,22 @@ class StyleLensControllerTest {
         request.setOccasion("wedding");
 
         assertThatThrownBy(() -> styleLensController.processImage("42", request))
-                .isInstanceOf(Exception.class)
-                .hasMessage("Wrong user");
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage("User does not exist");
 
+        verify(styleLensRepository, never()).save(any());
+    }
+
+    @Test
+    void processImageThrowsInvalidUserIdAndSkipsLookupWhenUserIdNotNumeric() {
+        ImageRequest request = new ImageRequest();
+        request.setOccasion("wedding");
+
+        assertThatThrownBy(() -> styleLensController.processImage("abc", request))
+                .isInstanceOf(InvalidUserIdException.class)
+                .hasMessage("Invalid user id");
+
+        verify(userRepository, never()).findById(any());
         verify(styleLensRepository, never()).save(any());
     }
 }

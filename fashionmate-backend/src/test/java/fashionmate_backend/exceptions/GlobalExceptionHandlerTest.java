@@ -35,6 +35,12 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void invalidUserIdMapsTo400WithMessageBody() {
+        assertError(handler.handleInvalidUserId(new InvalidUserIdException("Invalid user id")),
+                HttpStatus.BAD_REQUEST, "Invalid user id");
+    }
+
+    @Test
     void emailAlreadyInUseMapsTo409WithMessageBody() {
         assertError(handler.handleEmailAlreadyInUse(new EmailAlreadyInUseException("Email already in use")),
                 HttpStatus.CONFLICT, "Email already in use");

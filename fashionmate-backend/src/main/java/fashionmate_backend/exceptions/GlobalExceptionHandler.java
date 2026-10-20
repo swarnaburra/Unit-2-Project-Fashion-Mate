@@ -31,6 +31,11 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, ex);
     }
 
+    @ExceptionHandler(InvalidUserIdException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidUserId(InvalidUserIdException ex) {
+        return error(HttpStatus.BAD_REQUEST, ex);
+    }
+
     @ExceptionHandler(EmailAlreadyInUseException.class)
     public ResponseEntity<Map<String, String>> handleEmailAlreadyInUse(EmailAlreadyInUseException ex) {
         return error(HttpStatus.CONFLICT, ex);
