@@ -789,3 +789,28 @@ Gaps: it attributed the ownership pattern to decision-004 (it's decision-001), a
   3. Memory-keeper updated only the entries named in the brief; a related stale fact (decision-003 baseline) needed a human fix.
   4. Orchestrator proposed a new decision-009 at checkpoint 2, against the update-existing-entries policy; caught by the human.
 - **Changes for the next iteration:** (1) Orchestrator v1.1: at checkpoint 1, after open questions are answered, show the final plan and require an explicit "approve plan"; (2) tester v1.1: "if the container lacks a JDK, report NOT RUN immediately; do not probe with other commands"; (3) Orchestrator brief to memory-keeper should list every entry that quotes a changed fact (e.g. test baselines in decision-003), and memory-keeper should search the index for other mentions of the same fact; (4) Module 4 candidate: a PreToolUse rule restricting the tester's Bash to its two commands.
+
+## Orchestrated Workflow — Run 1 diagnosis (delegation-specific failures) — 2026-10-20
+
+Source: Run 1 transcript (decision-005 gap 3), classified by the lesson's four delegation failure types. Context bleed was not observed: every subagent cited only material from its brief or files it read itself.
+
+### Misfire 1: tester probed the environment outside its two allowed commands (over-broad tool grant)
+- What happened: before reporting, the tester requested `which docker mvn java javac; docker version; ls fashionmate-backend/mvnw`. The human declined it; the tester then reported `NOT RUN - needs human`.
+- Roles involved: tester.
+- Cause: the tester is granted the generic `Bash` tool; its "two commands only" limit is an instruction, and v1.0.0 said "If the backend command can't run here ... report NOT RUN", which invited it to *check* whether it can run first. Decision-003 already records the answer (no JDK in this container).
+- Proposed fix: tester v1.1.0 forbids any probe command and reports `NOT RUN - needs human` for backend changes immediately, without running anything (fixed below). Longer term (Module 4): a PreToolUse rule that allows the tester's `Bash` only for its two exact commands.
+
+### Misfire 2: memory-keeper brief omitted an entry quoting the changed fact (routing misfire: incomplete input)
+- What happened: the Orchestrator briefed the memory-keeper to update decision-004 and decision-005 only; decision-003's test baseline ("32 tests") and the index's `Last updated` date stayed stale until a human fixed them.
+- Roles involved: Orchestrator (built the brief), memory-keeper (consumed it).
+- Cause: neither the Orchestrator instructions nor the memory-keeper definition say to find every entry that quotes a fact the run changed.
+- Proposed fix: Orchestrator brief must list all entries mentioning a changed fact (e.g. test counts); memory-keeper v1.1 should search MEMORY_INDEX.md for other mentions before finishing. Not yet applied.
+
+### Misfire 3: checkpoint 1 approval inferred from answers to open questions (evaluation-gate weakness)
+- What happened: after the human answered the planner's three questions, the Orchestrator wrote "plan approved as-is (Checkpoint 1 passed)" and invoked the implementer without asking for explicit plan approval.
+- Roles involved: Orchestrator.
+- Cause: the CLAUDE.md checkpoint text ("write no code until the human approves") doesn't say approval must be explicit and separate from answering questions.
+- Proposed fix: Orchestrator v1.1: after questions are answered, show the final plan and require an explicit "approve plan". Not yet applied.
+
+### Fix applied: tester v1.1.0 (Misfire 1)
+- `.claude/agents/tester.md` 1.0.0 -> 1.1.0: step 2 now says run only the listed commands "exactly as written", "never run any other command, including to check the environment (no `which`, `docker`, `java`, `ls`, `mvn -v`, or similar probes)", and for backend changes "report `NOT RUN - needs human` immediately, without running anything", citing decision-003.

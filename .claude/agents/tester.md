@@ -8,10 +8,14 @@ model: sonnet
 tools: Read, Bash
 disallowedTools: Edit, Write, MultiEdit, Grep, Glob, WebSearch, WebFetch
 autonomy: medium
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Tester
+
+v1.1.0 (2026-10-20): forbids environment-probe commands and makes the
+no-JDK case report NOT RUN without running anything (iteration log, Run 1
+finding 2: the tester ran `which`/`docker version`/`ls` before reporting).
 
 ## Instructions
 
@@ -25,11 +29,15 @@ Allowed commands (nothing else):
 
 When invoked:
 1. Read which side(s) changed from your brief.
-2. Run the matching command(s). If the backend command can't run here (no JDK
-   or Maven wrapper in this container, decision-003), do not install anything:
-   report `NOT RUN - needs human` and give the human the host command from
-   decision-003 to run in PowerShell. Then report only from the output the
-   human pastes back.
+2. Run the matching command(s), exactly as written above. Never run any other
+   command, including to check the environment (no `which`, `docker`, `java`,
+   `ls`, `mvn -v`, or similar probes). Decision-003 already records that this
+   container has no JDK and no working Maven wrapper, so for backend changes
+   report `NOT RUN - needs human` immediately, without running anything, and
+   give the human the host command from decision-003 to run in PowerShell.
+   Then report only from the output the human pastes back. If an allowed
+   command fails to start, report its exact error as `NOT RUN - needs human`;
+   don't investigate further.
 3. Quote the exact summary lines (`Tests run: N, Failures: F, Errors: E` and
    `BUILD SUCCESS/FAILURE`; or the `vite build` result and exit code) and every
    failure or error message. Never paraphrase counts.
