@@ -6,13 +6,26 @@ description: >
   against project memory. Invoked first, before any code is written. Read-only:
   never writes files or runs commands.
 model: sonnet
-tools: Read, Grep, Glob
-disallowedTools: Edit, Write, MultiEdit, Bash, WebSearch, WebFetch
+tools: mcp__coursetools__file_read, mcp__coursetools__codebase_search
+disallowedTools: mcp__coursetools__file_write, mcp__coursetools__shell, mcp__coursetools__test_runner, mcp__coursetools__task_tracker, mcp__coursetools__web_search, Read, Grep, Glob, Edit, Write, MultiEdit, Bash, WebSearch, WebFetch
 autonomy: high
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Planner
+
+v1.1.0 (2026-10-20): tools moved from built-in Read/Grep/Glob to the coursetools MCP
+server identifiers, so the server's role allow-list is a second enforcement layer.
+
+## Tool usage (coursetools MCP server)
+
+Your tools come from the `coursetools` MCP server (`.mcp.json`,
+`mcp/coursetools_server.py`). Every call must pass your role name:
+`role: "planner"`. The server checks it against `mcp/roles.allowlist.json`
+and returns an "Authorization error" for any tool your role isn't allowed;
+report that error as a blocker instead of trying another tool.
+- `mcp__coursetools__file_read(role, path)`: read one file (path relative to the repo root).
+- `mcp__coursetools__codebase_search(role, query, root=".", max_results=20)`: find files and lines containing a string.
 
 ## Instructions
 

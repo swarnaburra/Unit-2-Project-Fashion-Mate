@@ -1,0 +1,27 @@
+{
+  "_comment": "FashionMate role allow-list for the coursetools MCP server. Mirrors docs/routing-and-tool-grant-map.md. Second enforcement layer behind each agent's tools: list.",
+  "file_read": [
+    "orchestrator",
+    "planner",
+    "implementer",
+    "reviewer",
+    "tester",
+    "memory-keeper"
+  ],
+  "file_write": [
+    "orchestrator",
+    "implementer",
+    "memory-keeper"
+  ],
+  "codebase_search": [
+    "planner",
+    "implementer",
+    "reviewer"
+  ],
+  "shell": [],
+  "test_runner": [
+    "tester"
+  ],
+  "task_tracker": [],
+  "web_search": []
+}

@@ -64,6 +64,10 @@ flowchart TD
 - **Halt and escalate:** the same gate failing twice in a row stops the run and reports to the human.
 - **Checkpoint 2 (human):** confirm before the memory-keeper writes to `.memory/project/`, so memory never records an unverified result (CLAUDE.md verification-status rule).
 
+## Tool wiring
+
+The planner and reviewer call the course **coursetools MCP server** (`.mcp.json`, `mcp/coursetools_server.py`) with `mcp__coursetools__file_read` / `mcp__coursetools__codebase_search`, passing their role; the server's allow-list (`mcp/roles.allowlist.json`) refuses any tool a role isn't granted. The other roles use Claude Code built-in tools. Full grants: `docs/routing-and-tool-grant-map.md`.
+
 ## Project-specific constraint
 
 - **Backend tests:** the dev container has no JDK (decision-003), so the tester can't run Maven inside it yet. Until a JDK is added, the tester asks the human to run the PowerShell Docker command and reports from the pasted output.

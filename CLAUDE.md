@@ -216,6 +216,15 @@ when all of the following hold:
   frontend `npm run build`), with quoted output,
 - the memory-keeper has recorded the verified outcome, after human confirmation.
 
+### MCP tools (coursetools)
+The planner (v1.1.0) and reviewer (v0.3.0) use the `coursetools` MCP server
+(`.mcp.json`, `mcp/coursetools_server.py`) instead of built-in tools. Every
+coursetools call carries a `role` argument checked against
+`mcp/roles.allowlist.json`. When you brief the planner or reviewer, remind them
+to pass their own role name. Treat an "Authorization error" from the server as
+a blocker to report, never as something to work around with another tool or
+role name. Never call coursetools yourself with another role's name.
+
 ### Standard sequence
 Use `.memory/knowledge/handoff-orchestrator-to-subagent.md` for every brief and
 expect `.memory/knowledge/handoff-subagent-to-orchestrator.md` back.
