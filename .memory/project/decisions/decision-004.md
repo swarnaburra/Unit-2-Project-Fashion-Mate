@@ -13,8 +13,9 @@
 | `MissingFieldsException` | `UserController.signIn` (missing email/password) | 400 | "Please enter your correct email and password" |
 | `EmailAlreadyInUseException` | `UserController.signUp` | 409 | "Email already in use" |
 | `InvalidCredentialsException` | `UserController.signIn` (no user for email+password) | 401 | "User not found" |
-| `UserNotFoundException` | `ReviewController.checkUserExist` (GET/POST/DELETE reviews) | 404 | "User does not exist" |
+| `UserNotFoundException` | `ReviewController.checkUserExist` (GET/POST/DELETE reviews); also `StyleLensController.processImage` (missing user, since 2026-10-20) | 404 | "User does not exist" |
 | `ReviewNotFoundException` | `ReviewController.deleteReview` (missing or not yours) | 404 | "Review not found" |
+| `InvalidUserIdException` | `StyleLensController.processImage` (non-numeric `userId`) | 400 | "Invalid user id" |
 
 `signUp`/`signIn` no longer declare `throws Exception`. There is deliberately **no** catch-all `@ExceptionHandler(Exception.class)`.
 
@@ -26,4 +27,4 @@
 - A catch-all `Exception` handler returning 500 with `{"message": ...}`: hides framework 4xx errors.
 - Changing the message texts (e.g. "Invalid email or password"): clearer, but would change what the frontend displays; left for a separate frontend-coordinated change.
 
-**Not covered:** `StyleLensController` still throws raw `Exception("Wrong user")` (500); out of scope for item 2.
+**Update 2026-10-20:** The `StyleLensController` gap noted below is resolved (decision-005 gap 3). `StyleLensController.processImage` no longer throws raw `Exception("Wrong user")` (500) or lets `NumberFormatException` propagate (500). It now reuses `UserNotFoundException` (404, table row above) for a missing user and throws the new `InvalidUserIdException` (400, table row above) for a non-numeric `userId`. Verified 2026-10-20, 34 tests passing (see decision-005).

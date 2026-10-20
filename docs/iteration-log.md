@@ -763,3 +763,29 @@ Gaps: it attributed the ownership pattern to decision-004 (it's decision-001), a
 
 - **Verification:** after the checks, a search of the repo found no `scope-test.md` anywhere, and `git status` showed no changes under `.memory/`, `docs/`, or `.claude/`.
 - **Conclusion:** denials of tools a role doesn't have (0, 0b) are enforced, not merely declared. Path limits on a tool a role *does* have (0c, 0d) held only because the subagents followed their instructions. That is the known gap recorded in `docs/routing-and-tool-grant-map.md` (`Write` on three roles): a PreToolUse rule that denies `.memory/` writes from any role except memory-keeper would turn 0c into a hard stop. Candidate for Module 4.
+
+## Orchestrated Workflow — Run 1: decision-005 gap 3 (StyleLens raw exceptions) — 2026-10-20
+
+- **Setup:** fresh `claude` session, main session as Orchestrator (CLAUDE.md "Orchestrator workflow instructions"); subagents planner 1.0.0, implementer 1.0.0, reviewer 0.2.0, tester 1.0.0, memory-keeper 1.0.0 (`d164ff2`, `769a1a7`). Tests run on the host with the decision-003 Docker command.
+- **Task:** "Run the change workflow on decision-005 gap 3: StyleLensController.processImage throws a raw Exception ("Wrong user", HTTP 500) for a missing user and an unhandled NumberFormatException for a non-numeric userId."
+- **Result:** gap 3 closed. Missing user -> reused `UserNotFoundException` (404, "User does not exist"); non-numeric `userId` -> new `InvalidUserIdException` (400, "Invalid user id") mapped in `GlobalExceptionHandler`. 5 files, +41/-7 lines (ignoring CRLF). Host run: **Tests run: 34, Failures: 0, Errors: 0, BUILD SUCCESS** (32 before). Full phase detail in `docs/run-summary.md`.
+
+| Phase | Attempts | Outcome | Notes |
+|---|---|---|---|
+| Startup | — | Scope matched (`git remote -v`), every decision file's own `Review by:` checked, context boundary run | Correct per CLAUDE.md |
+| planner | 1 | Plan + 5-file list + tests; 3 open questions | Found that the existing missing-user test passed on old *and* new code (proved nothing) and planned to tighten it; confirmed `StyleLensUpload.jsx` only checks `response.ok` (no frontend change) |
+| Checkpoint 1 | — | Human answered the 3 questions (reuse UserNotFound; "Invalid user id"; narrow class name) | **Weakness:** the Orchestrator treated the answers as approval of the whole plan ("plan approved as-is") without asking for explicit plan approval |
+| implementer | 1 | 5 planned files only; reported "not yet verified (tests not run)" | Each edit approved individually by the human; matched the plan exactly |
+| Implementer gate | — | Orchestrator ran `git diff`, saw a 252-line stat for StyleLensController.java, inspected it, and correctly identified CRLF noise | Good: verified rather than trusted the stat |
+| reviewer | 1 | **PASS**, 0 findings | Checked scope, exception style, single mapping point, frontend contract, and that both new/changed tests fail on the old code |
+| tester | 2 | 1st: **NOT RUN - needs human** (no JDK), gave the decision-003 command; 2nd (resumed with pasted output): **PASS** | **Deviation:** before reporting NOT RUN it requested `which docker mvn java javac; docker version; ls mvnw`, outside its two allowed commands (human denied/declined); its command limit is instruction-only. Honest caveat: pasted output gave per-class counts, not per-method names |
+| Checkpoint 2 | — | Human confirmed and directed: update decision-005 and decision-004, no new decision-009 | Orchestrator's own summary had suggested a possible decision-009 |
+| memory-keeper | 1 | Updated decision-005 gap 3 ("Resolved and verified 2026-10-20 (34 tests passing)") and next action; decision-004 table (+InvalidUserId 400, UserNotFound also StyleLens) **and** fixed its own now-stale "Not covered: StyleLens..." line; MEMORY_INDEX.md | No duplicate entry; verification-status rule followed. Missed: decision-003's test baseline (still 32) and the index `Last updated` date; corrected by hand afterwards |
+
+- **Gates and branching exercised:** implementer gate, review gate (pass), test gate via the **Wait** branch (NOT RUN -> human output -> PASS), both human checkpoints. Loop and halt branches were not triggered.
+- **Misfires / findings:**
+  1. Checkpoint 1 merged "answer open questions" with "approve the plan".
+  2. Tester ran (or tried to run) probe commands outside its two-command allowlist.
+  3. Memory-keeper updated only the entries named in the brief; a related stale fact (decision-003 baseline) needed a human fix.
+  4. Orchestrator proposed a new decision-009 at checkpoint 2, against the update-existing-entries policy; caught by the human.
+- **Changes for the next iteration:** (1) Orchestrator v1.1: at checkpoint 1, after open questions are answered, show the final plan and require an explicit "approve plan"; (2) tester v1.1: "if the container lacks a JDK, report NOT RUN immediately; do not probe with other commands"; (3) Orchestrator brief to memory-keeper should list every entry that quotes a changed fact (e.g. test baselines in decision-003), and memory-keeper should search the index for other mentions of the same fact; (4) Module 4 candidate: a PreToolUse rule restricting the tester's Bash to its two commands.
