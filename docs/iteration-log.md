@@ -853,3 +853,10 @@ Source: Run 1 transcript (decision-005 gap 3), classified by the lesson's four d
 
 - Conclusion: the reviewer's write denial is enforced at **two independent hard layers** (harness allowlist and server allow-list), plus the Orchestrator's soft rule against role impersonation. The tool was not added to complete the test.
 - Remaining gap: the server trusts the `role` argument the caller supplies. A misbehaving agent that *has* the tool could claim another role; the CLAUDE.md rule (2a) is the only thing preventing that today. Production fix: derive role from the authenticated caller, not a parameter.
+
+## Container network check — agent-internal — 2026-10-20
+
+- **Test:** in `agentic_engineer_3`, started `python3 -m http.server 8000 &` and ran `curl http://localhost:8000` and `curl https://example.com`, first with `--network none`, then on `--network agent-internal` (created with `docker network create --internal agent-internal`; `docker network ls` shows it with driver `bridge`).
+- **Result:** `--network none`: localhost **worked** (`"GET / HTTP/1.1" 200`, directory listing), example.com failed (`curl: (6) Could not resolve host: example.com`). `agent-internal`: localhost worked, example.com failed with the same error. `/workspace` and `/memory` mounted correctly.
+- **Finding:** the lesson's premise that `--network none` blocks loopback did not hold. Docker keeps `lo`, so same-container MCP traffic already works; `agent-internal` is needed for cross-container traffic and host-published ports while still blocking egress.
+- **Trade-off recorded:** the Claude Code harness also can't reach its model API on an internal network; harness sessions keep normal networking with explicit port mappings. Documented in `docs/container-network.md`.
