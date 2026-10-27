@@ -26,6 +26,11 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.NOT_FOUND, ex);
     }
 
+    @ExceptionHandler(GlamUpNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleGlamUpNotFound(GlamUpNotFoundException ex) {
+        return error(HttpStatus.NOT_FOUND, ex);
+    }
+
     @ExceptionHandler(MissingFieldsException.class)
     public ResponseEntity<Map<String, String>> handleMissingFields(MissingFieldsException ex) {
         return error(HttpStatus.BAD_REQUEST, ex);

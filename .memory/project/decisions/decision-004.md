@@ -16,6 +16,7 @@
 | `UserNotFoundException` | `ReviewController.checkUserExist` (GET/POST/DELETE reviews); also `StyleLensController.processImage` (missing user, since 2026-10-20) | 404 | "User does not exist" |
 | `ReviewNotFoundException` | `ReviewController.deleteReview` (missing or not yours) | 404 | "Review not found" |
 | `InvalidUserIdException` | `StyleLensController.processImage` (non-numeric `userId`) | 400 | "Invalid user id" |
+| `GlamUpNotFoundException` | `GlamUpController.getGlamUpBy` (empty GlamUp collection) | 404 | "No glam up content found" |
 
 `signUp`/`signIn` no longer declare `throws Exception`. There is deliberately **no** catch-all `@ExceptionHandler(Exception.class)`.
 
@@ -28,3 +29,5 @@
 - Changing the message texts (e.g. "Invalid email or password"): clearer, but would change what the frontend displays; left for a separate frontend-coordinated change.
 
 **Update 2026-10-20:** The `StyleLensController` gap noted below is resolved (decision-005 gap 3). `StyleLensController.processImage` no longer throws raw `Exception("Wrong user")` (500) or lets `NumberFormatException` propagate (500). It now reuses `UserNotFoundException` (404, table row above) for a missing user and throws the new `InvalidUserIdException` (400, table row above) for a non-numeric `userId`. Verified 2026-10-20, 34 tests passing (see decision-005).
+
+**Update 2026-10-27 (run-glamup-404):** Review finding — `GlamUpController.getGlamUpBy` threw `NoSuchElementException` (HTTP 500) when the GlamUp table is empty. Fixed with a new `GlamUpNotFoundException` mapped in `GlobalExceptionHandler` to 404 with message "No glam up content found" (table row above); `GlamUpController` now throws it instead of calling `.getFirst()` unconditionally. Reviewer verdict PASS (1 low-severity, non-blocking finding: the new test's assertion literal, "GlamUp not found", doesn't exactly match the production message above — cosmetic only, not corrected in this run). Verified 2026-10-27: `GlamUpControllerTest` 2/2, `GlobalExceptionHandlerTest` 7/7, full suite 35 passing, 0 failures, 0 errors, BUILD SUCCESS (up from the 34-test baseline of 2026-10-20), host-run via decision-003's Docker command.

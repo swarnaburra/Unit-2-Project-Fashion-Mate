@@ -1,5 +1,6 @@
 package fashionmate_backend.controllers;
 
+import fashionmate_backend.exceptions.GlamUpNotFoundException;
 import fashionmate_backend.models.GlamUp;
 import fashionmate_backend.repositories.GlamUpRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,14 @@ public class GlamUpController {
      * Returns the first {@link GlamUp} record found in the repository.
      *
      * @return the first {@link GlamUp} entity in the data store
-     * @throws java.util.NoSuchElementException if no {@link GlamUp} records exist,
-     *         since the underlying list will be empty and {@code getFirst()} will fail
+     * @throws GlamUpNotFoundException if no {@link GlamUp} records exist
      */
     @GetMapping()
     public GlamUp getGlamUpBy() {
         final var glamUps = glamUpRepository.findAll();
+        if (glamUps.isEmpty()) {
+            throw new GlamUpNotFoundException("No glam up content found");
+        }
         return glamUps.getFirst();
     }
 

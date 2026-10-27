@@ -1,6 +1,6 @@
 # Project Memory Index
 
-Last updated: 2026-10-20
+Last updated: 2026-10-27
 
 ## Active entries
 
@@ -10,7 +10,7 @@ Last updated: 2026-10-20
 
 - `decisions/decision-003.md` — How to run backend tests: `maven:3.9-eclipse-temurin-21` Docker image from PowerShell, `fashionmate-m2` cache volume, `contextLoads` excluded (needs MySQL); dev container has no JDK. Baseline 34 passing (2026-10-20). Read before running or reporting on tests. Recorded 2026-10-18. Review by 2027-01-16.
 
-- `decisions/decision-004.md` — Error status mapping: MissingFields 400, EmailAlreadyInUse 409, InvalidCredentials 401, UserNotFound 404 (now also StyleLens missing-user), ReviewNotFound 404, InvalidUserId 400 (new, StyleLens); no catch-all handler. Read before adding or changing any error handling. Recorded 2026-10-18, updated 2026-10-20. Review by 2027-01-16.
+- `decisions/decision-004.md` — Error status mapping: MissingFields 400, EmailAlreadyInUse 409, InvalidCredentials 401, UserNotFound 404 (now also StyleLens missing-user), ReviewNotFound 404, InvalidUserId 400 (StyleLens), GlamUpNotFound 404 (new, `GlamUpController.getGlamUpBy` on empty collection; run-glamup-404); no catch-all handler. Verified 2026-10-27, 35 tests passing. Read before adding or changing any error handling. Recorded 2026-10-18, updated 2026-10-20, 2026-10-27. Review by 2027-01-16.
 
 - `decisions/decision-005.md` — Status: FEATURES.md item 2 complete (29 tests); gap 1 (password leak) resolved/verified 2026-10-19 (decision-007); gap 3 (StyleLens raw exceptions) resolved/verified 2026-10-20 (34 tests passing); open: item 1 (plaintext passwords/JWT), gap 4 (no end-to-end HTTP check), gap 5 (response DTOs). Read before choosing the next backend task. Recorded 2026-10-18, updated 2026-10-20. Review by 2026-11-17.
 

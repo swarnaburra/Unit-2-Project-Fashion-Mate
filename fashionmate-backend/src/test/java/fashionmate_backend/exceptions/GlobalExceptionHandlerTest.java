@@ -52,6 +52,12 @@ class GlobalExceptionHandlerTest {
                 HttpStatus.UNAUTHORIZED, "User not found");
     }
 
+    @Test
+    void glamUpNotFoundMapsTo404WithMessageBody() {
+        assertError(handler.handleGlamUpNotFound(new GlamUpNotFoundException("GlamUp not found")),
+                HttpStatus.NOT_FOUND, "GlamUp not found");
+    }
+
     private void assertError(ResponseEntity<Map<String, String>> response, HttpStatus status, String message) {
         assertThat(response.getStatusCode()).isEqualTo(status);
         assertThat(response.getBody()).containsExactly(Map.entry("message", message));

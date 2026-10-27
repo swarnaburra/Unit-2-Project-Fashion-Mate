@@ -1,5 +1,6 @@
 package fashionmate_backend.controllers;
 
+import fashionmate_backend.exceptions.GlamUpNotFoundException;
 import fashionmate_backend.models.GlamUp;
 import fashionmate_backend.repositories.GlamUpRepository;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,6 +42,7 @@ class GlamUpControllerTest {
         when(glamUpRepository.findAll()).thenReturn(List.of());
 
         assertThatThrownBy(() -> glamUpController.getGlamUpBy())
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(GlamUpNotFoundException.class)
+                .hasMessage("No glam up content found");
     }
 }
