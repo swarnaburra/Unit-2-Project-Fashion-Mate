@@ -343,6 +343,9 @@ if __name__ == "__main__":
         "--chunking", choices=["paragraph", "semantic"], default="paragraph"
     )
     parser.add_argument("--boundary-threshold", type=float, default=0.75)
+    # FashionMate Lessons fix 1 (2026-10-27): short lesson paragraphs merged at the
+    # default 50 words diluted L2 below 0.65; probe_lesson_scores.py showed 20 fixes it.
+    parser.add_argument("--min-words", type=int, default=50)
     args = parser.parse_args()
 
     model = SentenceTransformer(EMBEDDING_MODEL)
@@ -352,7 +355,7 @@ if __name__ == "__main__":
     if args.chunking == "semantic":
         chunker = lambda body: chunk_semantic(body, args.boundary_threshold)
     else:
-        chunker = chunk_paragraphs
+        chunker = lambda body: chunk_paragraphs(body, min_words=args.min_words)
 
     build_index(conn, chunker)
 

@@ -16,7 +16,7 @@ echo "storage   pid $!  (log: .memory/runtime/storage-server.log)"
 
 RETRIEVAL_REFERENCE_DIR=/workspace/.memory/reference/lessons \
 RETRIEVAL_MAX_CEILING=internal \
-  python3 mcp/retrieval/server.py --port 8002 --host 127.0.0.1 --chunking paragraph > .memory/runtime/retrieval-server.log 2>&1 &
+  python3 mcp/retrieval/server.py --port 8002 --host 127.0.0.1 --chunking paragraph --min-words 20 > .memory/runtime/retrieval-server.log 2>&1 &
 echo "retrieval pid $!  (log: .memory/runtime/retrieval-server.log)"
 
 echo "Waiting for both servers..."
