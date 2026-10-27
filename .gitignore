@@ -16,3 +16,7 @@ token.json
 google_cred.json
 google_cred.json
 docs/transcripts/*.jsonl
+
+# MCP server runtime data (storage DB, audit log, server logs): not source
+.memory/runtime/
+__pycache__/

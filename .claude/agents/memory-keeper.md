@@ -7,12 +7,14 @@ description: >
   confirms (checkpoint 2).
 model: sonnet
 tools: Read, Edit, Write
-disallowedTools: Bash, Grep, Glob, MultiEdit, WebSearch, WebFetch
+disallowedTools: Bash, Grep, Glob, MultiEdit, WebSearch, WebFetch, mcp__retrieval__retrieve, mcp__storage__write_entry, mcp__storage__read_entry, mcp__storage__list_entries, mcp__storage__update_entry, mcp__storage__delete_entry
 autonomy: medium
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Memory Keeper
+
+v1.1.0 (2026-10-27): storage and retrieval MCP tools explicitly denied; this role does not need lessons access for its job.
 
 ## Instructions
 

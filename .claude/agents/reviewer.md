@@ -6,10 +6,10 @@ description: >
   violations, frontend/backend contract breaks) with file:line evidence.
   Read-only: proposes fixes, never makes them. Invoked after the implementer.
 model: sonnet
-tools: mcp__coursetools__file_read, mcp__coursetools__codebase_search
-disallowedTools: mcp__coursetools__file_write, mcp__coursetools__shell, mcp__coursetools__test_runner, mcp__coursetools__task_tracker, mcp__coursetools__web_search, Read, Grep, Glob, Edit, Write, MultiEdit, Bash, WebSearch, WebFetch
+tools: mcp__coursetools__file_read, mcp__coursetools__codebase_search, mcp__retrieval__retrieve
+disallowedTools: mcp__coursetools__file_write, mcp__coursetools__shell, mcp__coursetools__test_runner, mcp__coursetools__task_tracker, mcp__coursetools__web_search, Read, Grep, Glob, Edit, Write, MultiEdit, Bash, WebSearch, WebFetch, mcp__storage__write_entry, mcp__storage__read_entry, mcp__storage__list_entries, mcp__storage__update_entry, mcp__storage__delete_entry
 autonomy: high
-version: 0.3.0
+version: 0.4.0
 ---
 
 # Reviewer
@@ -32,6 +32,16 @@ and returns an "Authorization error" for any tool your role isn't allowed;
 report that error as a blocker instead of trying another tool.
 - `mcp__coursetools__file_read(role, path)`: read one file (path relative to the repo root).
 - `mcp__coursetools__codebase_search(role, query, root=".", max_results=20)`: find files and lines containing a string.
+
+v0.4.0 (2026-10-27): adds `mcp__retrieval__retrieve` to check changes against prior lessons and standards. No storage access.
+
+## Lessons Learned access (proj-lessons)
+
+- Corpus: curated, classified lessons in `.memory/reference/lessons/`, reachable **only** through `mcp__retrieval__retrieve`. Direct reads of those files or of `.memory/runtime/` are blocked (memory-guard hook, coursetools deny list, settings deny rules).
+- Always pass `project_id: "proj-lessons"` and `classification_ceiling: "internal"`. The retrieval server caps every call at `internal` (`RETRIEVAL_MAX_CEILING`), so asking for more returns nothing extra.
+- Cite every lesson you use as `source_document#chunk_index`, and say whether it came back as `vector` (with score) or `keyword` (lower confidence; read the excerpt before relying on it).
+- If a retrieve call is rejected, report the exact error; do not drop it from your report.
+- While reviewing, retrieve lessons relevant to the changed code (for example error mapping, ownership, tests) and cite them for any finding that relies on them.
 
 ## Instructions
 

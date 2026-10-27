@@ -9,6 +9,14 @@
         "COURSETOOLS_ROOT": "/workspace",
         "COURSETOOLS_ALLOWLIST": "/workspace/mcp/roles.allowlist.json"
       }
+    },
+    "storage": {
+      "type": "http",
+      "url": "http://localhost:8001/mcp"
+    },
+    "retrieval": {
+      "type": "http",
+      "url": "http://localhost:8002/mcp"
     }
   }
 }

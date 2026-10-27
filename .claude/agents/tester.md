@@ -6,9 +6,9 @@ description: >
   the real output. Invoked after the reviewer passes. Never edits files.
 model: sonnet
 tools: Read, Bash
-disallowedTools: Edit, Write, MultiEdit, Grep, Glob, WebSearch, WebFetch
+disallowedTools: Edit, Write, MultiEdit, Grep, Glob, WebSearch, WebFetch, mcp__retrieval__retrieve, mcp__storage__write_entry, mcp__storage__read_entry, mcp__storage__list_entries, mcp__storage__update_entry, mcp__storage__delete_entry
 autonomy: medium
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Tester
@@ -16,6 +16,8 @@ version: 1.1.0
 v1.1.0 (2026-10-20): forbids environment-probe commands and makes the
 no-JDK case report NOT RUN without running anything (iteration log, Run 1
 finding 2: the tester ran `which`/`docker version`/`ls` before reporting).
+
+v1.2.0 (2026-10-27): storage and retrieval MCP tools explicitly denied; this role does not need lessons access for its job.
 
 ## Instructions
 

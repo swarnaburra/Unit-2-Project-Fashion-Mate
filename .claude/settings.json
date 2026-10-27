@@ -5,12 +5,18 @@
       "mcp__gmail__read_email",
       "mcp__slack__slack_list_channels",
       "mcp__slack__slack_post_message"
+    ],
+    "deny": [
+      "Read(./.memory/reference/lessons/**)",
+      "Edit(./.memory/reference/lessons/**)",
+      "Read(./.memory/runtime/**)",
+      "Edit(./.memory/runtime/**)"
     ]
   },
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|Bash",
+        "matcher": "Read|Grep|Glob|Write|Edit|MultiEdit|NotebookEdit|Bash",
         "hooks": [
           {
             "type": "command",

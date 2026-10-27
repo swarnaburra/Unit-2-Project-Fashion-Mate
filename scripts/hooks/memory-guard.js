@@ -36,6 +36,18 @@ process.stdin.on('end', () => {
     }
   }
 
+  // FashionMate: no Claude tool may touch the classified lessons corpus or the
+  // storage server's runtime data directly; they are reachable only through MCP.
+  const PROTECTED = /\.memory\/(reference\/lessons|runtime)(\/|\b)/;
+  const raw = JSON.stringify(ti);
+  if (['Read', 'Grep', 'Glob', 'Write', 'Edit', 'MultiEdit', 'Bash', 'NotebookEdit'].includes(tool) && PROTECTED.test(raw.replace(/\\\\/g, '/'))) {
+    console.error(
+      `BLOCKED by memory-guard: ${tool} on the lessons corpus or storage runtime data. ` +
+      `Use mcp__retrieval__retrieve (lessons) or mcp__storage__* (stored entries) instead.`
+    );
+    process.exit(2);
+  }
+
   const normalized = target.replace(/\\/g, '/');
   if (!/(^|\/)\.memory\//.test(normalized) && !target.startsWith('.memory/ (via Bash)')) {
     process.exit(0);

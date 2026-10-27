@@ -225,6 +225,22 @@ to pass their own role name. Treat an "Authorization error" from the server as
 a blocker to report, never as something to work around with another tool or
 role name. Never call coursetools yourself with another role's name.
 
+### Lessons Learned (storage + retrieval MCP servers)
+Started with `sh scripts/start-mcp-servers.sh`; registered in `.mcp.json` as
+`storage` (8001) and `retrieval` (8002). Scope: `project_id: "proj-lessons"`.
+- planner: `mcp__retrieval__retrieve` to consult prior lessons before planning.
+- implementer: `mcp__storage__write_entry` / `list_entries` to record one new lesson.
+- reviewer: `mcp__retrieval__retrieve` to check the change against lessons/standards.
+- tester, memory-keeper, and the main session: no storage or retrieval calls during
+  an orchestrated run. Lessons stored by the implementer are candidates; a human
+  promotes them into `.memory/reference/lessons/` (curated corpus).
+- The retrieval server caps results at `internal`; the storage server accepts only
+  `proj-lessons` and rejects confidential/secret writes. Direct file access to the
+  corpus and to `.memory/runtime/` is blocked; never work around those blocks.
+- If a subagent reports that a tool it needs is missing or was rejected, treat it as
+  a blocker and report it to the human. Never perform that subagent's work yourself
+  with your own tools (finding from the 2026-10-27 implementer run).
+
 ### Standard sequence
 Use `.memory/knowledge/handoff-orchestrator-to-subagent.md` for every brief and
 expect `.memory/knowledge/handoff-subagent-to-orchestrator.md` back.

@@ -1,6 +1,6 @@
 # Routing-and-Tool-Grant Map: FashionMate App Change Workflow
 
-Version: 1.1.0 (2026-10-20): planner and reviewer now use coursetools MCP identifiers. Companion to `docs/orchestration-diagram.md`; matches the definitions in `.claude/agents/` (planner 1.0.0, implementer 1.0.0, reviewer 0.2.0, tester 1.0.0, memory-keeper 1.0.0) and the Orchestrator section of `CLAUDE.md`.
+Version: 1.2.0 (2026-10-27): adds storage and retrieval MCP grants for the Lessons Learned workflow. 1.1.0 (2026-10-20): planner and reviewer moved to coursetools MCP identifiers. Companion to `docs/orchestration-diagram.md`; matches the definitions in `.claude/agents/` (planner 1.0.0, implementer 1.0.0, reviewer 0.2.0, tester 1.0.0, memory-keeper 1.0.0) and the Orchestrator section of `CLAUDE.md`.
 
 **Tool names:** the planner and reviewer use the course **coursetools MCP server** (registered in `.mcp.json`, code in `mcp/coursetools_server.py`), with identifiers of the form `mcp__coursetools__<tool>`. Each call passes a `role`, and the server checks it against `mcp/roles.allowlist.json`, a second enforcement layer that returns an "Authorization error" even if an agent's `tools:` list were wrong. The other roles still use Claude Code built-ins (`Read`, `Grep`, `Glob`, `Edit`, `Write`, `Bash`, `Agent`), because the course server's `file_write` can't be path-restricted and its `test_runner` cannot run Maven here (FashionMate's version returns `NOT RUN - needs human`, never a fake PASS).
 
@@ -14,6 +14,24 @@ Version: 1.1.0 (2026-10-20): planner and reviewer now use coursetools MCP identi
 | **reviewer** | Approved plan, changed-file list, standards and decisions to check | Findings table with severity and `file:line` evidence; `PASS` / `CHANGES REQUESTED` | `mcp__coursetools__file_read`, `mcp__coursetools__codebase_search` | `Edit`, `Write`, `MultiEdit` (proposes fixes, never makes them), `Bash` (tester owns checks), `WebSearch`/`WebFetch` (reviews against repo standards only) | Read-only by design, so even at high autonomy it can only report; keeps review independent of implementation | High (read-only) |
 | **tester** | Changed files and which side(s) changed | Per side: exact command, quoted summary lines and failures, `PASS` / `FAIL` / `NOT RUN - needs human` | `Read`, `Bash` (only the two commands in its definition: backend Maven test, frontend `npm run build`) | `Edit`, `Write`, `MultiEdit` (must not "fix" code to make a failure pass), `Grep`/`Glob` (doesn't need to search), `WebSearch`/`WebFetch` (not needed) | Owns execution and nothing else; with no write tools it can't mask a failure | Medium (runs code, bounded to two commands) |
 | **memory-keeper** (tool-scoping role) | Run summary with the tester's verified result, after human checkpoint 2 | Changed memory files, before/after Status line, new index line | `Read`, `Edit`, `Write` (only under `.memory/project/`) | `Bash` (no command execution near memory), `Grep`/`Glob`, `MultiEdit` (reads only the index and the entry it updates), `WebSearch`/`WebFetch` | The only writer of project memory, so a wrong or premature memory claim traces to one role, and code roles never carry memory-writing duties in their context | Medium (changes the shared record future sessions trust; only after the human confirms) |
+
+## Lessons Learned access (storage + retrieval MCP servers, project `proj-lessons`)
+
+| Role | Storage operations | Retrieval | Classification ceiling | Why this access is needed for its bounded job |
+|---|---|---|---|---|
+| Orchestrator (main session) | none during a run | none during a run | — | It coordinates; consulting or recording lessons is a subagent's job. CLAUDE.md forbids doing a subagent's blocked work. |
+| **planner** | none | `retrieve` | internal (server cap) | Must check permitted prior lessons **before** deciding how the coding work proceeds. |
+| **implementer** | `write_entry`, `list_entries` | none | writes: public/internal only (server rejects confidential/secret) | Records **one new lesson learned** from the change; `list_entries` avoids duplicates. No update/delete, so it can't rewrite or erase history. |
+| **reviewer** | none | `retrieve` | internal (server cap) | Checks the change against prior lessons and standards while evaluating it. |
+| tester | none (explicitly denied) | none (explicitly denied) | — | Runs or reports tests from quoted output only; lessons would not change a pass/fail. |
+| memory-keeper | none (explicitly denied) | none (explicitly denied) | — | Writes `.memory/project/` decisions after verification; lessons are a separate store owned by storage. |
+
+**Enforcement points (system, not instructions):**
+- Per-agent `tools` allowlists and `disallowedTools` in `.claude/agents/*.md` (harness).
+- `RETRIEVAL_MAX_CEILING=internal` in `scripts/start-mcp-servers.sh`: the retrieval server uses `min(requested ceiling, cap)`, so even a caller asking for `confidential` cannot get the confidential lesson (ground-truth L8).
+- `STORAGE_ALLOWED_PROJECTS=proj-lessons`: the storage server rejects any other project; it already rejects confidential/secret writes and audits every write/update/delete.
+- No direct path to the data: the corpus (`.memory/reference/lessons/`) and runtime data (`.memory/runtime/`) are blocked for every Claude tool by the memory-guard PreToolUse hook, by `permissions.deny` rules in `.claude/settings.json`, and by the coursetools server's deny list. The corpus is also mounted `:ro`.
+- Known gap: storage's `calling_role` is self-reported by the caller, so the audit log trusts it; only the implementer has `write_entry`, which limits who can claim it.
 
 ## "Which role actually needs this?" tally
 

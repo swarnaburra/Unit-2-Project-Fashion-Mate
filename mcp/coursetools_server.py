@@ -58,10 +58,31 @@ def authorize(tool_name: str, role: str) -> None:
         )
 
 
+# FashionMate: paths that may only be reached through their own MCP servers.
+# The lessons corpus is classified (retrieval enforces the ceiling) and the storage
+# database/audit log are owned by the storage server, so file tools must not read them.
+DENIED_PREFIXES = [
+    (ROOT / p).resolve()
+    for p in os.environ.get(
+        "COURSETOOLS_DENY", ".memory/reference/lessons,.memory/runtime"
+    ).split(",")
+    if p.strip()
+]
+
+
+def is_denied(candidate: Path) -> bool:
+    return any(candidate == d or d in candidate.parents for d in DENIED_PREFIXES)
+
+
 def safe_path(path: str) -> Path:
     candidate = (ROOT / path).resolve()
     if not str(candidate).startswith(str(ROOT)):
         raise ValueError(f"Path escapes the project root: {path}")
+    if is_denied(candidate):
+        raise PermissionError(
+            f"Access denied: {path} is only reachable through its MCP server "
+            "(retrieval for the lessons corpus, storage for runtime data)."
+        )
     return candidate
 
 
@@ -98,7 +119,7 @@ def codebase_search(role: str, query: str, root: str = ".", max_results: int = 2
             break
         if any(part in ignored_dirs for part in path.parts):
             continue
-        if not path.is_file():
+        if not path.is_file() or is_denied(path.resolve()):
             continue
         try:
             text = path.read_text(encoding="utf-8")
