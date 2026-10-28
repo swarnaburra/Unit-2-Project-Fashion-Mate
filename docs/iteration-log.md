@@ -910,3 +910,13 @@ Source: Run 1 transcript (decision-005 gap 3), classified by the lesson's four d
   4. **Code stored in memory:** it put the full intended file contents into the storage decision record, mixing source code into project memory (allocation rule: code belongs in the repo).
   5. **Error-code fit is inferential:** no code is named for row limits; `E_EXPORT_417` is a reasonable but non-literal fit, which it disclosed.
 - Next: register coursetools (or grant a scoped write) and re-run the implementer; add "missing tool → report blocker" to the Orchestrator rules; require subagents to report rejected tool calls; require open questions instead of invented limits.
+
+## Lessons Learned workflow (proj-lessons) — 2026-10-27
+
+- Corpus: 9 classified lessons in `.memory/reference/lessons/` (8 internal, 1 confidential); ground truth L1–L8 committed before evaluation (`b17358a`).
+- Validation: Run 1 6/8 → probe showed L2 was diluted by 50-word chunk merging → one fix `--min-words 20` → Run 2 **7/8 (88%)**, no regressions; L6 known gap (wording, ≈0.33 under every chunking). Answer key unchanged. (`85e3c9f`, `3b4c916`)
+- Access: planner/reviewer `retrieve` only; implementer `write_entry` + `list_entries` only; tester/memory-keeper denied both; server caps retrieval at `internal` and storage at `proj-lessons`; corpus and `.memory/runtime/` blocked for every Claude tool.
+- Orchestrated run `run-glamup-404` (`a3aaf64`): planner cited 2 lessons (keyword hits); implementer stored one internal lesson (entry `4e2c9f12-…`); reviewer PASS (1 low); tester PASS from host Maven **35 tests, 0 failures, 0 errors** (2026-10-27T22:01Z); memory-keeper updated decision-004 + index after Checkpoint 2.
+- Verification: audit log shows exactly one `write_entry` by implementer; entry persisted across a storage restart and a new container (`mcp/verify_lessons.py`); requested-`confidential` retrieve returned only internal docs; direct Read of the confidential lesson blocked by `permissions.deny`.
+- Misfires: (1) terminal froze twice in console Select mode — resumed with a scoped brief, no work redone; (2) memory-guard blocked the Orchestrator writing a `.memory/runtime` reference into `run-summary.md` (over-block on a path mention; it did not work around it); (3) every live retrieval hit was keyword fallback because agent queries are jargon-heavy — add jargon-style queries to the next ground-truth version.
+- Report: `docs/lessons-learned-report.md`.
