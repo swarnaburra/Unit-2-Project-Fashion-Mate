@@ -68,7 +68,7 @@ Finding: `GlamUpController.getGlamUpBy` threw `NoSuchElementException` (500) on 
 
 ## 7. Answers
 
-**Q1 — Corpus vs storage.** The corpus (`.memory/reference/lessons/`) is curated, human-reviewed, classified source, mounted read-only and served only by retrieval, which is what agents cite. Storage (`proj-lessons` in SQLite) is the agents' write path for *new candidate* lessons: validated, project-scoped, audited, but not retrievable until a human promotes an entry into the corpus. Separating them stops an agent from writing something and then citing its own unreviewed text as authority.
+**Q1 — Corpus vs storage.** The corpus (`.memory/reference/lessons/`) is curated, human-reviewed, classified source, mounted read-only and served only by retrieval, which is what agents cite. Storage (`proj-lessons` in SQLite) is the agents' write path for *new candidate* lessons: validated, project-scoped, audited, but not retrievable until a human promotes an entry into the corpus. Separating them stops an agent from writing something and then citing its own unreviewed text as authority. The final persistence check ran in a new container without the `claude-auth` volume, through the storage MCP server, so persistence comes from storage, not from Claude authentication.
 
 **Q2 — Most important boundary, with evidence.** The server-side classification cap (`RETRIEVAL_MAX_CEILING=internal`). It is enforced by the server, not by the caller's choice: L8 and the post-run check requested `confidential` and still got only internal documents, while the confidential `security-open-exposures.md` (the best semantic match) never appeared. Backed by the direct-access block: a Read of that file was refused by `permissions.deny` before it opened.
 
